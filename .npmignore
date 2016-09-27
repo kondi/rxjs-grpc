@@ -1,0 +1,24 @@
+# temp folder
+/tmp
+
+# dependencies
+/node_modules
+/bower_components
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+/.vscode
+
+# misc
+/connect.lock
+/coverage/*
+npm-debug.log
+/checkstyle-result.xml
+
+# System Files
+.DS_Store
+Thumbs.db

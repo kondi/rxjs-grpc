@@ -1,0 +1,30 @@
+{
+  "main": "js/index",
+  "typings": "js/index",
+  "name": "rxjs-grpc",
+  "version": "0.0.1",
+  "description": "Typesafe gRPC with RxJS in TypeScript",
+  "license": "MIT",
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kondi/rxjs-grpc.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint --project .",
+    "prepublish": "npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "coverage": "jest --coverage",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.5.43",
+    "@types/node": "^7.0.5",
+    "jasmine": "^2.5.3",
+    "jest": "^19.0.2",
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1"
+  }
+}
