@@ -1,0 +1,35 @@
+# compiled output
+/js
+/tmp
+
+# dependencies
+/node_modules
+/bower_components
+/yarn.lock
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/connect.lock
+/coverage/*
+npm-debug.log
+/checkstyle-result.xml
+
+#System Files
+.DS_Store
+Thumbs.db
+
+# CLI generated
+/grpc-namespaces.ts

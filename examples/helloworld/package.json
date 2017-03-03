@@ -1,0 +1,25 @@
+{
+  "name": "rxjs-grpc-helloworld",
+  "version": "0.0.1",
+  "description": "Helloworld example for rxjs-grpc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kondi/rxjs-grpc.git"
+  },
+  "scripts": {
+    "start": "npm run grpc-namespaces",
+    "server": "ts-node server",
+    "client": "ts-node client",
+    "preserver": "npm run grpc-namespaces",
+    "preclient": "npm run grpc-namespaces",
+    "grpc-namespaces": "rxjs-grpc -o grpc-namespaces.ts *.proto"
+  },
+  "dependencies": {
+    "rxjs": "^5.2.0",
+    "rxjs-grpc": "file:../.."
+  },
+  "devDependencies": {
+    "ts-node": "^2.1.0"
+  }
+}
