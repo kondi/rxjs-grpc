@@ -81,8 +81,8 @@ function transformTypeScriptSource(source: string) {
   source = `import { Observable } from 'rxjs';\n${source}`;
   // Fix generic type syntax
   source = source.replace(/Observable\.</g, 'Observable<');
-  // Export interfaces
-  source = source.replace(/^(\s+)interface/mg, '$1 export interface');
+  // Export interfaces and enums
+  source = source.replace(/^(\s+)(interface|enum)(\s+)/mg, '$1 export $2$3');
   return source;
 }
 
@@ -140,6 +140,10 @@ function cleanMethodSignatures(ast: any) {
     .forEach((path: any) => {
       if (path.node.expression.type === 'AssignmentExpression') {
         const left = jscodeshift(path.node.expression.left).toSource();
+        // do not remove enums
+        if (path.node.comments.some((comment: any) => /@enum/.test(comment.value))) {
+          return;
+        }
         // Remove static methods and converter methods, we export simple interfaces
         if (!/\.prototype\./.test(left) || /\.(toObject|toJSON)/.test(left)) {
           path.node.comments = [];
