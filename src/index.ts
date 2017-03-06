@@ -7,7 +7,7 @@ export interface GenericServerBuilder<T> {
   start(address: string, credentials?: any): void;
 }
 
-export function serverBuilder<T extends GenericServerBuilder<T>>(protoPath: string, packageName: string) {
+export function serverBuilder<T>(protoPath: string, packageName: string): T & GenericServerBuilder<T> {
   const server = new grpc.Server();
 
   const builder: DynamicMethods = <GenericServerBuilder<T>> {
@@ -25,7 +25,7 @@ export function serverBuilder<T extends GenericServerBuilder<T>>(protoPath: stri
     };
   }
 
-  return builder as T;
+  return builder as any;
 }
 
 function createService(Service: any, rxImpl: DynamicMethods) {

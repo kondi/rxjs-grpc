@@ -77,7 +77,6 @@ function transformTypeScriptSource(source: string) {
   // Remove imports
   source = source.replace(/^import.*?$\n?/mg, '');
   // Add our imports
-  source = `import { GenericServerBuilder } from 'rxjs-grpc';\n${source}`;
   source = `import { Observable } from 'rxjs';\n${source}`;
   // Fix generic type syntax
   source = source.replace(/Observable\.</g, 'Observable<');
@@ -211,7 +210,6 @@ function buildServerBuilderSource(namespace: string, services: Services) {
     /**
      * Builder for an RPC service server.
      * @exports ${namespace}.ServerBuilder
-     * @extends GenericServerBuilder<ServerBuilder>
      * @interface
      */
     function ServerBuilder() {}

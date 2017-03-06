@@ -80,7 +80,6 @@ greeter.sayHello({ name: 'world' }).forEach(response => {
 
 ```typescript
 import { Observable } from 'rxjs';
-import { GenericServerBuilder } from 'rxjs-grpc';
 
 export namespace sample {
 
@@ -88,7 +87,7 @@ export namespace sample {
     getGreeter(): sample.Greeter;
   }
 
-  export interface ServerBuilder extends GenericServerBuilder<ServerBuilder> {
+  export interface ServerBuilder {
     addGreeter(impl: sample.Greeter): sample.ServerBuilder;
   }
 
