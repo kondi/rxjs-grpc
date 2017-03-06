@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/kondi/rxjs-grpc.svg?branch=master)](https://travis-ci.org/kondi/rxjs-grpc)
 [![npm version](https://badge.fury.io/js/rxjs-grpc.svg)](https://badge.fury.io/js/rxjs-grpc)
 
 # rxjs-grpc
