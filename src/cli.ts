@@ -69,6 +69,21 @@ export async function buildTypeScript(protoFiles: string[]) {
   }
 }
 
+export async function buildTypeScriptFromSources(protoSources: string[]) {
+  const tempDir = await createTempDir();
+  try {
+    const protoFiles = [];
+    for (const source of protoSources) {
+      const file = `${tempDir.name}/${Math.random()}.proto`;
+      await fs.writeFile(file, source);
+      protoFiles.push(file);
+    }
+    return await buildTypeScript(protoFiles);
+  } finally {
+    tempDir.removeCallback();
+  }
+}
+
 function printUsage() {
   console.log('Usage: rxjs-grpc -o [output] file.proto');
   console.log('');

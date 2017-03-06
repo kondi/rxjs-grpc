@@ -34,11 +34,13 @@
   },
   "devDependencies": {
     "@types/bluebird": "^3.0.37",
+    "@types/glob": "^5.0.30",
     "@types/jasmine": "^2.5.43",
     "@types/minimist": "^1.2.0",
     "@types/mz": "^0.0.30",
     "@types/node": "^7.0.5",
     "@types/tmp": "^0.0.32",
+    "glob": "^7.1.1",
     "grpc": "^1.1.2",
     "jasmine": "^2.5.3",
     "jest": "^19.0.2",
