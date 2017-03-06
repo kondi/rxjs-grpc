@@ -15,7 +15,16 @@ const createTempDir = promisify((callback: (error: any, result: tmp.Synchrounous
 
 type Services = { reference: string, name: string }[];
 
-async function main(args: string[]) {
+export function bootstrap() {
+  main(process.argv.slice(2))
+    .then(code => process.exit(code))
+    .catch(error => {
+      console.error(error);
+      process.exit(1);
+    });
+}
+
+export async function main(args: string[]) {
   const { _: protoFiles, out } = minimist(args, {
     alias: {
       out: 'o'
@@ -25,9 +34,19 @@ async function main(args: string[]) {
 
   if (protoFiles.length === 0) {
     printUsage();
-    process.exit(1);
+    return 1;
   }
 
+  let ts = await buildTypeScript(protoFiles);
+  if (out) {
+    await fs.writeFile(out, ts);
+  } else {
+    process.stdout.write(ts);
+  }
+  return 0;
+}
+
+export async function buildTypeScript(protoFiles: string[]) {
   const tempDir = await createTempDir();
   try {
     // Use pbjs to generate static JS code for the protobuf definitions
@@ -44,13 +63,7 @@ async function main(args: string[]) {
 
     // Create TypeScript file
     const tsFile = await call(tempDir.name, pbts, [jsFile], 'ts');
-    const ts = transformTypeScriptSource(await fs.readFile(tsFile, 'utf8'));
-
-    if (out) {
-      await fs.writeFile(out, ts);
-    } else {
-      process.stdout.write(ts);
-    }
+    return transformTypeScriptSource(await fs.readFile(tsFile, 'utf8'));
   } finally {
     tempDir.removeCallback();
   }
@@ -253,5 +266,3 @@ async function call(tempDir: string, func: Callable, files: string[], ext = 'js'
 function flatten<T>(arr: T[][]): T[] {
   return Array.prototype.concat(...arr);
 }
-
-main(process.argv.slice(2)).catch(error => console.error(error));
