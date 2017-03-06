@@ -7,6 +7,11 @@ const jscodeshift = require('jscodeshift');
 
 const pbjs = promisify(require('protobufjs/cli/pbjs').main) as any;
 const pbts = promisify(require('protobufjs/cli/pbts').main) as any;
+const createTempDir = promisify((callback: (error: any, result: tmp.SynchrounousResult) => any) => {
+  tmp.dir({ unsafeCleanup: true }, (error, name, removeCallback) => {
+    callback(error, { name, removeCallback, fd: -1 });
+  });
+});
 
 type Services = { reference: string, name: string }[];
 
@@ -23,7 +28,7 @@ async function main(args: string[]) {
     process.exit(1);
   }
 
-  const tempDir = tmp.dirSync({ unsafeCleanup: true });
+  const tempDir = await createTempDir();
   try {
     // Use pbjs to generate static JS code for the protobuf definitions
     const jsFile = await call(tempDir.name, pbjs, protoFiles, 'js',
