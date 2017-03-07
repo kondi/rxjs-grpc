@@ -309,7 +309,7 @@ function buildClientFactorySource(namespace: string, services: Services) {
        * @returns {${service.reference}}
        */
       ClientFactory.prototype.get${service.name} = function() {};
-    `)}
+    `).join('\n')}
   `;
 }
 
@@ -339,7 +339,7 @@ function buildServerBuilderSource(namespace: string, services: Services) {
        * @returns {${namespace}.ServerBuilder}
        */
       ServerBuilder.prototype.add${service.name} = function() {};
-    `)}
+    `).join('\n')}
   `;
 }
 
