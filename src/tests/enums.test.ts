@@ -67,4 +67,18 @@ describe('enum test', () => {
     expect(result.ok).toBe(true);
   });
 
+  it('should allow field to be assigned to enum var', async () => {
+    const result = compileInMemory({
+      'grpc-namespaces.ts': namespaces,
+      'test.ts': `
+        import { test } from './grpc-namespaces';
+
+        const message: test.Message = {};
+        const enumVar: test.EnumType = message.field;
+      `
+    });
+    expect(result.errors).toEqual([]);
+    expect(result.ok).toBe(true);
+  });
+
 });
