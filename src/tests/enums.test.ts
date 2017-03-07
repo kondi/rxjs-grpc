@@ -81,4 +81,23 @@ describe('enum test', () => {
     expect(result.ok).toBe(true);
   });
 
+  it('should not allow assigning other enum type', async () => {
+    const result = compileInMemory({
+      'grpc-namespaces.ts': namespaces,
+      'test.ts': `
+        import { test } from './grpc-namespaces';
+
+        export enum OtherEnumType {
+          ONE = 1,
+          TWO = 2
+        }
+
+        const message: test.Message = {};
+        message.field = OtherEnumType.ONE;
+      `
+    });
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.ok).toBe(false);
+  });
+
 });
