@@ -173,8 +173,8 @@ function transformTypeScriptSource(source: string) {
   source = `import { Observable } from 'rxjs';\n${source}`;
   // Fix generic type syntax
   source = source.replace(/Observable\.</g, 'Observable<');
-  // Export interfaces and enums
-  source = source.replace(/^(\s+)(interface|enum)(\s+)/mg, '$1 export $2$3');
+  // Export interfaces, enums and namespaces
+  source = source.replace(/^(\s+)(interface|enum|namespace)(\s+)/mg, '$1 export $2$3');
   return source;
 }
 
@@ -184,11 +184,18 @@ function addFactoryAndBuild(ast: any) {
   const declaration = getNamepaceDeclarations(ast);
   const namespace = getNamepaceName(declaration);
 
+  const ownServices = services
+    .filter(service => service.reference.startsWith(namespace))
+    .filter(service => {
+      const relative = service.reference.substring(namespace.length + 1);
+      return !relative.includes('.');
+    });
+
   declaration.insertBefore(sourceToNodes(
-    buildClientFactorySource(namespace, services)
+    buildClientFactorySource(namespace, ownServices)
   ));
   declaration.insertBefore(sourceToNodes(
-    buildServerBuilderSource(namespace, services)
+    buildServerBuilderSource(namespace, ownServices)
   ));
 }
 
