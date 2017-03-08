@@ -1,11 +1,11 @@
 import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
-describe('complete usage', () => {
+describe('full api test', () => {
 
   let namespaces: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     namespaces = await cli.buildTypeScriptFromSources([
       `
         syntax = "proto3";

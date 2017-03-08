@@ -5,7 +5,7 @@ describe('multiple services test', () => {
 
   let namespaces: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     namespaces = await cli.buildTypeScriptFromSources([
       `
         syntax = "proto3";
