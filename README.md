@@ -45,17 +45,17 @@ import { serverBuilder } from 'rxjs-grpc';
 import { sample } from './grpc-namespaces';
 
 // Pass the path of proto file and the name of namespace
-serverBuilder<sample.ServerBuilder>('sample.proto', 'sample')
-  // Add implementation
-  .addGreeter({
-    sayHello(request: sample.HelloReply) {
-      return Observable.of({
-        message: 'Hello ' + request.name
-      });
-    }
-  })
-  // Start the server to listen on port 50051
-  .start('0.0.0.0:50051');
+const server = serverBuilder<sample.ServerBuilder>('sample.proto', 'sample')
+// Add implementation
+server.addGreeter({
+  sayHello(request: sample.HelloReply) {
+    return Observable.of({
+      message: 'Hello ' + request.name
+    });
+  }
+})
+// Start the server to listen on port 50051
+server.start('0.0.0.0:50051');
 ```
 
 Call it from a client:
