@@ -16,7 +16,10 @@
 # misc
 /connect.lock
 /coverage/*
-npm-debug.log
+/jest
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 /checkstyle-result.xml
 
 # System Files
