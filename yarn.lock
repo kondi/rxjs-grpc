@@ -2812,7 +2812,7 @@ protobufjs@^5.0.0:
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protobufjs@^6.6.4:
+protobufjs@~6.6.5:
   version "6.6.5"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.6.5.tgz#beafc3aac777f2787c9674e092d157a2e28f9312"
   dependencies:
