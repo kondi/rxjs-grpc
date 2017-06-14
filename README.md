@@ -48,7 +48,7 @@ import { sample } from './grpc-namespaces';
 const server = serverBuilder<sample.ServerBuilder>('sample.proto', 'sample')
 // Add implementation
 server.addGreeter({
-  sayHello(request: sample.HelloReply) {
+  sayHello(request: sample.HelloRequest) {
     return Observable.of({
       message: 'Hello ' + request.name
     });
