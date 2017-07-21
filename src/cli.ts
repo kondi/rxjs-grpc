@@ -170,7 +170,7 @@ function transformTypeScriptSource(source: string) {
   // Remove imports
   source = source.replace(/^import.*?$\n?/mg, '');
   // Add our imports
-  source = `import { Observable } from 'rxjs';\n${source}`;
+  source = `import { Observable } from 'rxjs';\nimport * as $protobuf from 'protobufjs';\n${source}`;
   // Fix generic type syntax
   source = source.replace(/Observable\.</g, 'Observable<');
   // Export interfaces, enums and namespaces
