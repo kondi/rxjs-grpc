@@ -14,6 +14,7 @@ describe('messages test', () => {
         message Message {
           string name = 1;
           uint32 number = 2;
+          int64 number2 = 3;
         }
       `
     ]);
