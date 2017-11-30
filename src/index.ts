@@ -7,6 +7,7 @@ type DynamicMethods = { [name: string]: any; };
 
 export interface GenericServerBuilder<T> {
   start(address: string, credentials?: any): void;
+  forceShutdown(): void;
 }
 
 export function serverBuilder<T>(protoPath: string, packageName: string): T & GenericServerBuilder<T> {
@@ -16,13 +17,16 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
     start(address: string, credentials?: any) {
       server.bind(address, credentials || grpc.ServerCredentials.createInsecure());
       server.start();
+    },
+    forceShutdown() {
+      server.forceShutdown();
     }
   };
 
   const pkg = lookupPackage(grpc.load(protoPath), packageName)
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
-      server.addProtoService(pkg[name].service, createService(pkg[name], rxImpl));
+      server.addService(pkg[name].service, createService(pkg[name], rxImpl));
       return this;
     };
   }
@@ -73,7 +77,7 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
     constructor(address: string, credentials?: any, options: any = undefined) {
       this.__args = [
         address,
-        credentials || grpc.credentials.createInsecure(),
+        credentials || grpc.Credentials.createInsecure(),
         options
       ];
     }
