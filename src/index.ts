@@ -7,6 +7,7 @@ type DynamicMethods = { [name: string]: any; };
 
 export interface GenericServerBuilder<T> {
   start(address: string, credentials?: any): void;
+  forceShutdown(): void;
 }
 
 export function serverBuilder<T>(protoPath: string, packageName: string): T & GenericServerBuilder<T> {
@@ -16,6 +17,9 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
     start(address: string, credentials?: any) {
       server.bind(address, credentials || grpc.ServerCredentials.createInsecure());
       server.start();
+    },
+    forceShutdown() {
+      server.forceShutdown();
     }
   };
 

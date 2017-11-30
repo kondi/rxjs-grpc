@@ -7,6 +7,7 @@ declare module 'grpc' {
       addProtoService(service: any, impl: any): void;
       bind(hostPort: string, cred: any): void;
       start(): void;
+      forceShutdown(): void;
     }
 
     class credentials {
