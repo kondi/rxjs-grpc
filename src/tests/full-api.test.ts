@@ -4,6 +4,16 @@ import { compileInMemory } from './utils';
 describe('full api test', () => {
 
   let namespaces: string;
+  let originalTimeout: number;
+
+  beforeEach(() => {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+  });
+
+  afterEach(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   beforeAll(async () => {
     namespaces = await cli.buildTypeScriptFromSources([
