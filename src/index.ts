@@ -26,7 +26,7 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
   const pkg = lookupPackage(grpc.load(protoPath), packageName)
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
-      server.addProtoService(pkg[name].service, createService(pkg[name], rxImpl));
+      server.addService(pkg[name].service, createService(pkg[name], rxImpl));
       return this;
     };
   }
@@ -77,7 +77,7 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
     constructor(address: string, credentials?: any, options: any = undefined) {
       this.__args = [
         address,
-        credentials || grpc.credentials.createInsecure(),
+        credentials || grpc.Credentials.createInsecure(),
         options
       ];
     }

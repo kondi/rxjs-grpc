@@ -6,6 +6,16 @@ import * as cli from '../cli';
 import { compileInMemory, Sources } from './utils';
 
 describe('compile/examples', () => {
+  let originalTimeout: number;
+
+  beforeEach(() => {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+  });
+
+  afterEach(() => {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   const EXAMPLES_FOLDER = path.join(__dirname, '..', '..', 'examples');
 

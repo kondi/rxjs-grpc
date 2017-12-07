@@ -4,13 +4,13 @@ declare module 'grpc' {
     function load(protoPath: string): any;
 
     class Server {
-      addProtoService(service: any, impl: any): void;
+      addService(service: any, impl: any): void;
       bind(hostPort: string, cred: any): void;
       start(): void;
       forceShutdown(): void;
     }
 
-    class credentials {
+    class Credentials {
       static createInsecure(): any;
     }
 
