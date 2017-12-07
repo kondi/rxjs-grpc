@@ -23,6 +23,9 @@
     "coverage": "jest --coverage",
     "watch": "tsc --watch"
   },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./setup-jest"
+  },
   "dependencies": {
     "bluebird": "^3.4.7",
     "grpc": "^1.1.2",
@@ -43,7 +46,7 @@
     "glob": "^7.1.1",
     "grpc": "^1.1.2",
     "jasmine": "^2.5.3",
-    "jest": "^19.0.2",
+    "jest": "^21.2.1",
     "rxjs": "^5.2.0",
     "tslint": "^4.5.1",
     "typescript": "^2.2.1"
