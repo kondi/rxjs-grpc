@@ -179,7 +179,7 @@ function transformTypeScriptSource(source: string) {
   // Fix generic type syntax
   source = source.replace(/Observable\.</g, 'Observable<');
   // Export interfaces, enums and namespaces
-  source = source.replace(/^(\s+)(interface|enum|namespace)(\s+)/mg, '$1 export $2$3');
+  source = source.replace(/^(\s+)(interface|enum|namespace)(\s+)/mg, '$1export $2$3');
   return source;
 }
 
