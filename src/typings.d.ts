@@ -1,7 +1,8 @@
+
 declare module 'grpc' {
 
   namespace grpc {
-    function load(protoPath: string): any;
+    function load(options: LoadOptions): any;
 
     class Server {
       addProtoService(service: any, impl: any): void;
@@ -16,6 +17,11 @@ declare module 'grpc' {
 
     class ServerCredentials {
       static createInsecure(): any;
+    }
+
+    interface LoadOptions {
+      root: string;
+      file: string;
     }
   }
 
