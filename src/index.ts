@@ -1,6 +1,8 @@
 import * as grpc from 'grpc';
 import { Observable } from 'rxjs/Observable';
 
+const though2 = require('through2');
+
 import { lookupPackage } from './utils';
 
 type DynamicMethods = { [name: string]: any; };
@@ -10,8 +12,15 @@ export interface GenericServerBuilder<T> {
   forceShutdown(): void;
 }
 
-export function serverBuilder<T>(protoPath: string, packageName: string): T & GenericServerBuilder<T> {
+export interface MainOptions {
+  protoPath?: string;
+  packageName?: string;
+  pkg?: any; // GRPC already loaded
+}
+
+export function serverBuilder<T>(options: MainOptions): T & GenericServerBuilder<T> {
   const server = new grpc.Server();
+  const { protoPath, packageName } = options;
 
   const builder: DynamicMethods = <GenericServerBuilder<T>> {
     start(address: string, credentials?: any) {
@@ -23,7 +32,9 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
     }
   };
 
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  let pkg = options.pkg;
+  if(protoPath && packageName)
+    pkg = lookupPackage(grpc.load(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
       server.addProtoService(pkg[name].service, createService(pkg[name], rxImpl));
@@ -70,7 +81,9 @@ function createStreamingMethod(rxImpl: DynamicMethods, name: string) {
 
 export type ClientFactoryConstructor<T> = new(address: string, credentials?: any, options?: any) => T;
 
-export function clientFactory<T>(protoPath: string, packageName: string) {
+export function clientFactory<T>(options: MainOptions) {
+  const { protoPath, packageName } = options;
+
   class Constructor {
 
     readonly __args: any[];
@@ -85,7 +98,9 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
   }
 
   const prototype: DynamicMethods = Constructor.prototype;
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  let pkg = options.pkg;
+    if(protoPath && packageName)
+      pkg = lookupPackage(grpc.load(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
     prototype[`get${name}`] = function(this: Constructor) {
       return createServiceClient(pkg[name], this.__args);
@@ -133,9 +148,21 @@ function createStreamingClientMethod(grpcClient: DynamicMethods, name: string) {
   return function(...args: any[]) {
     return new Observable(observer => {
       const call = grpcClient[name](...args);
-      call.on('data', (data: any) => observer.next(data));
-      call.on('error', (error: any) => observer.error(error));
-      call.on('end', () => observer.complete());
+
+      const onData = (data: any, _: any, cb:any) => {
+        observer.next(data)
+        cb();
+      };
+      const onError = (error: any) => observer.error(error);
+
+      const onEnd = (cb: any) => {
+        observer.complete()
+        cb();
+        call.removeListener('error', onError);
+      }
+
+      call.pipe(though2.obj(onData, onEnd));
+      call.on('error', onError);
     });
   };
 }

@@ -4,7 +4,7 @@ import { helloworld } from './grpc-namespaces';
 
 async function main() {
   type ClientFactory = helloworld.ClientFactory;
-  const Services = clientFactory<ClientFactory>('helloworld.proto', 'helloworld');
+  const Services = clientFactory<ClientFactory>({ protoPath: 'helloworld.proto', packageName: 'helloworld' });
 
   const services = new Services('localhost:50051');
   const greeter = services.getGreeter();

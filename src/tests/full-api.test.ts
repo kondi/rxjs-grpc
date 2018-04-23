@@ -36,7 +36,7 @@ describe('full api test', () => {
 
         import { test } from './grpc-namespaces';
 
-        const server = serverBuilder<test.ServerBuilder>('test.proto', 'test');
+        const server = serverBuilder<test.ServerBuilder>({ protoPath:'test.proto', packageName: 'test' });
 
         server.addService({
 
@@ -69,7 +69,7 @@ describe('full api test', () => {
 
         import { test } from './grpc-namespaces';
 
-        const Services = clientFactory<test.ClientFactory>('test.proto', 'test');
+        const Services = clientFactory<test.ClientFactory>({ protoPath:'test.proto', packageName: 'test' });
 
         const services = new Services('localhost:1234');
         const Service = services.getService();
