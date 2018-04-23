@@ -5,7 +5,7 @@ import { helloworld } from './grpc-namespaces';
 
 async function main() {
   type ServerBuilder = helloworld.ServerBuilder;
-  const server = serverBuilder<ServerBuilder>('helloworld.proto', 'helloworld');
+  const server = serverBuilder<ServerBuilder>({ protoPath: 'helloworld.proto', packageName: 'helloworld' });
 
   server.addGreeter({
 
