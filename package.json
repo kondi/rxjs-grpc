@@ -2,7 +2,7 @@
   "main": "js/index",
   "typings": "js/index",
   "name": "@lexset/rxjs-grpc",
-  "version": "0.1.7",
+  "version": "0.1.89",
   "description": "Typesafe gRPC with RxJS in TypeScript",
   "license": "MIT",
   "keywords": [],
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "bluebird": "3.4.7",
-    "grpc": "1.1.2",
+    "grpc": "1.11.1",
     "jscodeshift": "0.3.30",
     "minimist": "1.2.0",
     "mz": "2.6.0",
