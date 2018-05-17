@@ -52,18 +52,26 @@ function createMethod(rxImpl: DynamicMethods, name: string, serviceMethods: Dyna
 
 function createUnaryMethod(rxImpl: DynamicMethods, name: string) {
   return function(call: any, callback: any) {
-    const response: Observable<any> = rxImpl[name](call.request, call.metadata);
-    response.subscribe(
-      data => callback(null, data),
-      error => callback(error)
-    );
+    try {
+      const response: Observable<any> = rxImpl[name](call.request, call.metadata);
+      response.subscribe(
+        data => callback(null, data),
+        error => callback(error)
+      );
+    } catch (error) {
+      callback(error);
+    }
   };
 }
 
 function createStreamingMethod(rxImpl: DynamicMethods, name: string) {
-  return async function(call: any, callback: any) {
-    const response: Observable<any> = rxImpl[name](call.request, call.metadata);
-    await response.forEach(data => call.write(data));
+  return async function(call: any) {
+    try {
+      const response: Observable<any> = rxImpl[name](call.request, call.metadata);
+      await response.forEach(data => call.write(data));
+    } catch (error) {
+      call.emit('error', error);
+    }
     call.end();
   };
 }
