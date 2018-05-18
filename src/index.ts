@@ -10,7 +10,7 @@ export interface GenericServerBuilder<T> {
   forceShutdown(): void;
 }
 
-export function serverBuilder<T>(protoPath: string, packageName: string): T & GenericServerBuilder<T> {
+export function serverBuilder<T>(protoRoot: string, protoFile: string, packageName: string): T & GenericServerBuilder<T> {
   const server = new grpc.Server();
 
   const builder: DynamicMethods = <GenericServerBuilder<T>> {
@@ -23,7 +23,9 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
     }
   };
 
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  const pkg = lookupPackage(grpc.load({
+    root: protoRoot,
+    file: protoFile}), packageName);
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
       server.addProtoService(pkg[name].service, createService(pkg[name], rxImpl));
@@ -78,7 +80,7 @@ function createStreamingMethod(rxImpl: DynamicMethods, name: string) {
 
 export type ClientFactoryConstructor<T> = new(address: string, credentials?: any, options?: any) => T;
 
-export function clientFactory<T>(protoPath: string, packageName: string) {
+export function clientFactory<T>(protoRoot: string, protoFile: string, packageName: string) {
   class Constructor {
 
     readonly __args: any[];
@@ -93,7 +95,9 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
   }
 
   const prototype: DynamicMethods = Constructor.prototype;
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  const pkg = lookupPackage(grpc.load({
+    root: protoRoot,
+    file: protoFile}), packageName);
   for (const name of getServiceNames(pkg)) {
     prototype[`get${name}`] = function(this: Constructor) {
       return createServiceClient(pkg[name], this.__args);

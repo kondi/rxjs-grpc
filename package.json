@@ -1,8 +1,8 @@
 {
   "main": "js/index",
   "typings": "js/index",
-  "name": "rxjs-grpc",
-  "version": "0.1.7",
+  "name": "@lexset/rxjs-grpc",
+  "version": "0.1.89",
   "description": "Typesafe gRPC with RxJS in TypeScript",
   "license": "MIT",
   "keywords": [],
@@ -27,29 +27,29 @@
     "setupTestFrameworkScriptFile": "./setup-jest"
   },
   "dependencies": {
-    "bluebird": "^3.4.7",
-    "grpc": "^1.1.2",
-    "jscodeshift": "^0.3.30",
-    "minimist": "^1.2.0",
-    "mz": "^2.6.0",
-    "protobufjs": "~6.6.5",
-    "tmp": "^0.0.31"
+    "bluebird": "3.4.7",
+    "grpc": "1.11.1",
+    "jscodeshift": "0.3.30",
+    "minimist": "1.2.0",
+    "mz": "2.6.0",
+    "protobufjs": "6.6.5",
+    "tmp": "0.0.31"
   },
   "devDependencies": {
-    "@types/bluebird": "^3.0.37",
-    "@types/glob": "^5.0.30",
-    "@types/jasmine": "^2.5.43",
-    "@types/minimist": "^1.2.0",
-    "@types/mz": "^0.0.30",
-    "@types/node": "^7.0.5",
-    "@types/tmp": "^0.0.32",
-    "glob": "^7.1.1",
-    "grpc": "^1.1.2",
-    "jasmine": "^2.5.3",
-    "jest": "^21.2.1",
-    "rxjs": "^5.2.0",
-    "tslint": "^4.5.1",
-    "typescript": "^2.2.1"
+    "@types/bluebird": "3.0.37",
+    "@types/glob": "5.0.30",
+    "@types/jasmine": "2.5.43",
+    "@types/minimist": "1.2.0",
+    "@types/mz": "0.0.30",
+    "@types/node": "7.0.5",
+    "@types/tmp": "0.0.32",
+    "glob": "7.1.1",
+    "grpc": "1.1.2",
+    "jasmine": "2.5.3",
+    "jest": "21.2.1",
+    "rxjs": "5.2.0",
+    "tslint": "4.5.1",
+    "typescript": "2.2.1"
   },
   "peerDependencies": {
     "rxjs": "^5.2.0"
