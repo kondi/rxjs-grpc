@@ -1,6 +1,6 @@
 import * as grpc from 'grpc';
 import { Observable } from 'rxjs/Observable';
-
+import { _finally } from 'rxjs/operator/finally';
 import { lookupPackage } from './utils';
 
 type DynamicMethods = { [name: string]: any; };
@@ -139,11 +139,14 @@ function createUnaryClientMethod(grpcClient: DynamicMethods, name: string) {
 
 function createStreamingClientMethod(grpcClient: DynamicMethods, name: string) {
   return function(...args: any[]) {
-    return new Observable(observer => {
-      const call = grpcClient[name](...args);
+    const call = grpcClient[name](...args);
+    const obs = new Observable(observer => {
       call.on('data', (data: any) => observer.next(data));
       call.on('error', (error: any) => observer.error(error));
       call.on('end', () => observer.complete());
+    });
+    return _finally.apply(obs, ()=> {
+      call.cancel();
     });
   };
 }
