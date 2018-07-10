@@ -31,7 +31,7 @@ describe('full api test', () => {
     const result = compileInMemory({
       'grpc-namespaces.ts': namespaces,
       'test.ts': `
-        import { Observable } from 'rxjs';
+        import { of } from 'rxjs';
         import { serverBuilder } from 'rxjs-grpc';
 
         import { test } from './grpc-namespaces';
@@ -41,13 +41,13 @@ describe('full api test', () => {
         server.addService({
 
           single(request) {
-            return Observable.of({
+            return of({
               reply_field: 'Hello ' + request.request_field
             });
           },
 
           streaming(request) {
-            return Observable.of({
+            return of({
               reply_field: 'Hello ' + request.request_field
             });
           }

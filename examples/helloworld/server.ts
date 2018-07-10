@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs';
+import { of, timer } from 'rxjs';
+import { mapTo, take } from 'rxjs/operators';
 import { serverBuilder } from 'rxjs-grpc';
 
 import { helloworld } from './grpc-namespaces';
@@ -10,15 +11,16 @@ async function main() {
   server.addGreeter({
 
     sayHello(request) {
-      return Observable.of({
+      return of({
         message: 'Hello ' + request.name
       });
     },
 
     sayMultiHello(request) {
-      return Observable.timer(100, 500)
-        .mapTo({ message: `Hello ${request.name}` })
-        .take(request.num_greetings);
+      return timer(100, 500).pipe(
+        mapTo({ message: `Hello ${request.name}` }),
+        take(request.num_greetings),
+      );
     }
 
   });
