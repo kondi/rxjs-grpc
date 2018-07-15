@@ -27,6 +27,7 @@
     "setupTestFrameworkScriptFile": "./setup-jest"
   },
   "dependencies": {
+    "@grpc/proto-loader": "^0.3.0",
     "bluebird": "^3.4.7",
     "grpc": "^1.13.0",
     "jscodeshift": "^0.3.30",

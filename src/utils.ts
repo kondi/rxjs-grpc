@@ -1,7 +1,9 @@
-export function lookupPackage(root: any, packageName: string) {
+import { GrpcObject } from 'grpc';
+
+export function lookupPackage(root: GrpcObject, packageName: string): any {
   let pkg = root;
   for (const name of packageName.split(/\./)) {
-    pkg = pkg[name];
+    pkg = <GrpcObject>pkg[name];
   }
   return pkg;
 }
