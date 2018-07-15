@@ -40,7 +40,7 @@ $ ./node_modules/.bin/rxjs-grpc -o grpc-namespaces.ts *.proto
 Implement your typesafe server returning `Observable<sample.HelloReply>`:
 
 ```typescript
-import { Observable } from 'rxjs';
+import { of } from 'rxjs';
 import { serverBuilder } from 'rxjs-grpc';
 import { sample } from './grpc-namespaces';
 
@@ -49,7 +49,7 @@ const server = serverBuilder<sample.ServerBuilder>('sample.proto', 'sample')
 // Add implementation
 server.addGreeter({
   sayHello(request: sample.HelloRequest) {
-    return Observable.of({
+    return of({
       message: 'Hello ' + request.name
     });
   }
