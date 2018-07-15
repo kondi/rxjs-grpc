@@ -1,4 +1,5 @@
 import * as grpc from 'grpc';
+import { loadSync } from '@grpc/proto-loader';
 import { Observable } from 'rxjs';
 
 import { lookupPackage } from './utils';
@@ -23,10 +24,19 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
     }
   };
 
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  const packageDefinition = loadSync(
+    protoPath,
+    {keepCase: true,
+     longs: String,
+     enums: String,
+     defaults: true,
+     oneofs: true
+    });
+  const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
+  const pkg = lookupPackage(protoDescriptor, packageName);
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
-      server.addProtoService(pkg[name].service, createService(pkg[name], rxImpl));
+      server.addService(pkg[name].service, createService(pkg[name], rxImpl));
       return this;
     };
   }

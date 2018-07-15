@@ -27,8 +27,9 @@
     "setupTestFrameworkScriptFile": "./setup-jest"
   },
   "dependencies": {
+    "@grpc/proto-loader": "^0.3.0",
     "bluebird": "^3.4.7",
-    "grpc": "^1.1.2",
+    "grpc": "^1.13.0",
     "jscodeshift": "^0.3.30",
     "minimist": "^1.2.0",
     "mz": "^2.6.0",
@@ -44,7 +45,7 @@
     "@types/node": "^7.0.5",
     "@types/tmp": "^0.0.32",
     "glob": "^7.1.1",
-    "grpc": "^1.1.2",
+    "grpc": "^1.13.0",
     "jasmine": "^2.5.3",
     "jest": "^21.2.1",
     "rxjs": "^6.0.0",
