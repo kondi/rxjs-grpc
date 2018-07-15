@@ -33,11 +33,11 @@ export function compileInMemory(sources: Sources) {
 function createCompilerHost(sources: Sources, options: ts.CompilerOptions): ts.CompilerHost {
   const compilerHost = ts.createCompilerHost(options);
   compilerHost.getSourceFile = function(fileName: string, version: ts.ScriptTarget) {
-    let sourceText;
+    let sourceText: string;
     if (fileName in sources) {
       sourceText = sources[fileName];
     } else {
-      sourceText = ts.sys.readFile(fileName);
+      sourceText = ts.sys.readFile(fileName) || '';
     }
     return ts.createSourceFile(fileName, sourceText, version);
   };
@@ -64,7 +64,7 @@ function extractErrors(emitResult: ts.EmitResult, program: ts.Program) {
   const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
   return allDiagnostics.map(diagnostic => {
     let prefix = '';
-    if (diagnostic.file) {
+    if (diagnostic.file && diagnostic.start) {
       const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
       prefix = `${diagnostic.file.fileName} (${line + 1},${character + 1}): `;
     }
