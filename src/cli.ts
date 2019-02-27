@@ -112,6 +112,8 @@ function transformJavaScriptSource(source: string, root: protobuf.Root) {
   fixEnums(ast, root);
   // Change constructors to interfaces and remove their parameters
   constructorsToInterfaces(ast);
+  // Remove $Properties typedefs, as we use the original type name
+  removePropertiesType(ast);
   // Clean method signatures
   cleanMethodSignatures(ast);
   // Add the ClientFactory and ServerBuilder interfaces
@@ -172,12 +174,14 @@ function transformTypeScriptSource(source: string) {
   // Add our imports
   source = `import { Observable } from 'rxjs/Observable';\n${source}`;
 
-  if(source.includes("$protobuf")) {
+  if (source.includes("$protobuf")) {
     source = `import * as $protobuf from 'protobufjs';\n${source}`
   }
 
   // Fix generic type syntax
   source = source.replace(/Observable\.</g, 'Observable<');
+  // Remove public keyword from the field, because they are not allowed in interface
+  source = source.replace(/^(\s+)public\s+/mg, '$1');
   // Export interfaces, enums and namespaces
   source = source.replace(/^(\s+)(interface|enum|namespace)(\s+)/mg, '$1export $2$3');
   return source;
@@ -262,6 +266,20 @@ function constructorsToInterfaces(ast: any) {
     });
 }
 
+function removePropertiesType(ast: any) {
+  ast
+    .find(jscodeshift.FunctionDeclaration)
+    .forEach((path: any) => {
+      path.node.comments.forEach((comment: any) => {
+        // Remove $Properties typedefs, as we use the original type name
+        if (/@typedef\s+\S+\$Properties/.test(comment.value)) {
+          comment.value = '';
+        }
+      });
+      jscodeshift(path).replaceWith(path.node);
+    });
+}
+
 function cleanMethodSignatures(ast: any) {
   ast
     .find(jscodeshift.ExpressionStatement)
@@ -290,7 +308,7 @@ function cleanMethodSignatures(ast: any) {
         // Change signature of service methods
         if (/@param\s+[^\n]*_Callback/.test(comment.value)) {
           comment.value = comment.value.replace(/^[\s\*]+@param\s+[^\n]*_Callback.*$\n?/gm, '');
-          comment.value = comment.value.replace(/(@param\s*\{.*?)\|Object(\})/g, '$1$2');
+          comment.value = comment.value.replace(/(@param\s*\{.*?)\|Object(\.<.*?>)?(\})/g, '$1$3');
           if (returnType) {
             comment.value = comment.value.replace(/@returns.*$/gm, `@returns {Observable<${returnType}>}`);
           }
