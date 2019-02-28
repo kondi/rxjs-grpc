@@ -1,5 +1,5 @@
 import * as grpc from 'grpc';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 import { lookupPackage } from './utils';
 
