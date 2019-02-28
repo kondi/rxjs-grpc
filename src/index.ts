@@ -5,9 +5,12 @@ import { Observable } from 'rxjs';
 import { lookupPackage } from './utils';
 
 type DynamicMethods = { [name: string]: any };
+type GrpcService<T> = typeof grpc.Client & {
+  service: grpc.ServiceDefinition<T>;
+};
 
 export interface GenericServerBuilder<T> {
-  start(address: string, credentials?: any): void;
+  start(address: string, credentials?: grpc.ServerCredentials): void;
   forceShutdown(): void;
 }
 
@@ -18,7 +21,7 @@ export function serverBuilder<T>(
   const server = new grpc.Server();
 
   const builder: DynamicMethods = <GenericServerBuilder<T>>{
-    start(address: string, credentials?: any) {
+    start(address, credentials) {
       server.bind(address, credentials || grpc.ServerCredentials.createInsecure());
       server.start();
     },
@@ -30,7 +33,8 @@ export function serverBuilder<T>(
   const pkg = lookupPackage(grpcLoad(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
-      server.addService(pkg[name].service, createService(pkg[name], rxImpl));
+      const serviceData = (pkg[name] as any) as GrpcService<any>;
+      server.addService(serviceData.service, createService(serviceData, rxImpl));
       return this;
     };
   }
@@ -47,7 +51,7 @@ function grpcLoad(protoPath: string) {
   return grpc.loadPackageDefinition(packageDefinition);
 }
 
-function createService(Service: any, rxImpl: DynamicMethods) {
+function createService(Service: GrpcService<any>, rxImpl: DynamicMethods) {
   const service: DynamicMethods = {};
   for (const name in Service.prototype) {
     if (typeof rxImpl[name] === 'function') {
@@ -63,19 +67,22 @@ function createMethod(rxImpl: DynamicMethods, name: string, serviceMethods: Dyna
     : createUnaryMethod(rxImpl, name);
 }
 
-function createUnaryMethod(rxImpl: DynamicMethods, name: string) {
-  return function(call: any, callback: any) {
+function createUnaryMethod(rxImpl: DynamicMethods, name: string): grpc.handleUnaryCall<any, any> {
+  return function(call, callback) {
     try {
       const response: Observable<any> = rxImpl[name](call.request, call.metadata);
-      response.subscribe(data => callback(null, data), error => callback(error));
+      response.subscribe(data => callback(null, data), error => callback(error, null));
     } catch (error) {
-      callback(error);
+      callback(error, null);
     }
   };
 }
 
-function createStreamingMethod(rxImpl: DynamicMethods, name: string) {
-  return async function(call: any) {
+function createStreamingMethod(
+  rxImpl: DynamicMethods,
+  name: string,
+): grpc.handleServerStreamingCall<any, any> {
+  return async function(call) {
     try {
       const response: Observable<any> = rxImpl[name](call.request, call.metadata);
       await response.forEach(data => call.write(data));
@@ -88,14 +95,14 @@ function createStreamingMethod(rxImpl: DynamicMethods, name: string) {
 
 export type ClientFactoryConstructor<T> = new (
   address: string,
-  credentials?: any,
+  credentials?: grpc.ChannelCredentials,
   options?: any,
 ) => T;
 
 export function clientFactory<T>(protoPath: string, packageName: string) {
   class Constructor {
-    readonly __args: any[];
-    constructor(address: string, credentials?: any, options: any = undefined) {
+    readonly __args: [string, grpc.ChannelCredentials, any | undefined];
+    constructor(address: string, credentials?: grpc.ChannelCredentials, options: any = undefined) {
       this.__args = [address, credentials || grpc.credentials.createInsecure(), options];
     }
   }
@@ -104,19 +111,22 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
   const pkg = lookupPackage(grpcLoad(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
     prototype[`get${name}`] = function(this: Constructor) {
-      return createServiceClient(pkg[name], this.__args);
+      return createServiceClient((pkg[name] as any) as GrpcService<any>, this.__args);
     };
   }
 
   return (Constructor as any) as ClientFactoryConstructor<T>;
 }
 
-function getServiceNames(pkg: any) {
-  return Object.keys(pkg).filter(name => pkg[name].service);
+function getServiceNames(pkg: grpc.GrpcObject) {
+  return Object.keys(pkg).filter(name => (pkg[name] as GrpcService<any>).service);
 }
 
-function createServiceClient(GrpcClient: any, args: any[]) {
-  const grpcClient = new GrpcClient(...args);
+function createServiceClient(
+  GrpcClient: GrpcService<any>,
+  args: [string, grpc.ChannelCredentials, any | undefined],
+) {
+  const grpcClient = new GrpcClient(args[0], args[1], args[2]);
   const rxClient: DynamicMethods = {};
   for (const name of Object.keys(GrpcClient.prototype)) {
     rxClient[name] = createClientMethod(grpcClient, name);
