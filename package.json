@@ -32,7 +32,7 @@
     "jscodeshift": "^0.3.30",
     "minimist": "^1.2.0",
     "mz": "^2.6.0",
-    "protobufjs": "~6.6.5",
+    "protobufjs": "6.8.8",
     "tmp": "^0.0.31"
   },
   "devDependencies": {

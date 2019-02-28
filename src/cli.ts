@@ -1,13 +1,15 @@
 import * as minimist from 'minimist';
 import * as protobuf from 'protobufjs';
+import { pbjs, pbts } from 'protobufjs/cli';
 import * as tmp from 'tmp';
 import { fs } from 'mz';
 import { promisify } from 'bluebird';
 
 const jscodeshift = require('jscodeshift');
 
-const pbjs = promisify(require('protobufjs/cli/pbjs').main) as any;
-const pbts = promisify(require('protobufjs/cli/pbts').main) as any;
+const pbjsMain = promisify(pbjs.main);
+const pbtsMain = promisify(pbts.main);
+
 const createTempDir = promisify((callback: (error: any, result: tmp.SynchrounousResult) => any) => {
   tmp.dir({ unsafeCleanup: true }, (error, name, removeCallback) => {
     callback(error, { name, removeCallback, fd: -1 });
@@ -18,9 +20,6 @@ type NamedReference = {
   reference: string;
   name: string;
 };
-interface ScopedMessage extends NamedReference {
-  scope: any;
-}
 type Services = NamedReference[];
 
 export function bootstrap() {
@@ -58,7 +57,7 @@ export async function buildTypeScript(protoFiles: string[]) {
   const tempDir = await createTempDir();
   try {
     // Use pbjs to generate static JS code for the protobuf definitions
-    const jsFile = await call(tempDir.name, pbjs, protoFiles, 'js',
+    const jsFile = await call(tempDir.name, pbjsMain, protoFiles, 'js',
       ['keep-case'],
       {
         target: 'static-module',
@@ -66,7 +65,7 @@ export async function buildTypeScript(protoFiles: string[]) {
       }
     );
 
-    const jsonDescriptor = await call(tempDir.name, pbjs, protoFiles, 'js',
+    const jsonDescriptor = await call(tempDir.name, pbjsMain, protoFiles, 'js',
       ['keep-case'],
       { target: 'json' }
     );
@@ -76,7 +75,7 @@ export async function buildTypeScript(protoFiles: string[]) {
     await fs.writeFile(jsFile, js);
 
     // Create TypeScript file
-    const tsFile = await call(tempDir.name, pbts, [jsFile], 'ts');
+    const tsFile = await call(tempDir.name, pbtsMain, [jsFile], 'ts');
     return transformTypeScriptSource(await fs.readFile(tsFile, 'utf8'));
   } finally {
     tempDir.removeCallback();
@@ -108,64 +107,18 @@ function printUsage() {
 
 function transformJavaScriptSource(source: string, root: protobuf.Root) {
   const ast = jscodeshift(source);
-  // Fix fields with enum type
-  fixEnums(ast, root);
   // Change constructors to interfaces and remove their parameters
   constructorsToInterfaces(ast);
-  // Remove $Properties typedefs, as we use the original type name
-  removePropertiesType(ast);
   // Clean method signatures
   cleanMethodSignatures(ast);
+  // Remove message members (we use declared interfaces)
+  removeMembers(ast, root);
   // Add the ClientFactory and ServerBuilder interfaces
   getNamepaceDeclarations(ast)
     .closestScope()
     .forEach((path: any) => addFactoryAndBuild(jscodeshift(path.node)));
   // Render AST
   return ast.toSource();
-}
-
-function fixEnums(ast: any, root: protobuf.Root) {
-  for (const message of collectMessages(ast)) {
-    const type = root.lookupType(message.reference);
-    for (const field of type.fieldsArray) {
-      const enumType = field.resolve().resolvedType;
-      if (enumType instanceof protobuf.Enum) {
-        fixEnumField(message, field);
-      }
-    }
-  }
-}
-
-function fixEnumField(message: ScopedMessage, field: protobuf.Field) {
-  // remove the initial dot
-  const fullType = field.resolvedType.fullName.substring(1);
-  // enumType
-  message.scope
-    .find(jscodeshift.AssignmentExpression, {
-      left: {
-        type: 'MemberExpression',
-        object: {
-          type: 'MemberExpression',
-          property: {
-            name: 'prototype'
-          }
-        },
-        property: {
-          name: field.name
-        }
-      }
-    })
-    .closest(jscodeshift.ExpressionStatement)
-    .filter((p: any) => p.node.comments)
-    .forEach((path: any) => {
-      path.node.comments.forEach((comment: any) => {
-        comment.value = (comment.value as string).replace(
-          /^([\s]*\*[\s]*@type[\s]+\{)number(\}|\|)/gm,
-          (_, prefix, postfix) => `${prefix}${fullType}${postfix}`
-        );
-      });
-      jscodeshift(path).replaceWith(path.node);
-    });
 }
 
 function transformTypeScriptSource(source: string) {
@@ -190,7 +143,9 @@ function transformTypeScriptSource(source: string) {
 function addFactoryAndBuild(ast: any) {
   const services = collectServices(ast);
 
-  const declaration = getNamepaceDeclarations(ast);
+  const declaration = getNamepaceDeclarations(ast).filter(
+    (path: any, index: number) => index === 0
+  );
   const namespace = getNamepaceName(declaration);
 
   const ownServices = services
@@ -218,35 +173,16 @@ function collectServices(ast: any) {
     .forEach((p: any) => {
       const reference = getReference(p);
       if (reference) {
-        services.push({ reference, name: p.node.id.name });
+        const name = p.node.id.name;
+        services.push({ reference: reference + '.' + name, name });
       }
     });
   return services;
 }
 
-function collectMessages(ast: any): ScopedMessage[] {
-  const messages: ScopedMessage[] = [];
-  ast
-    .find(jscodeshift.FunctionDeclaration)
-    .filter((p: any) => p.node.comments)
-    // only message constructors have exactly 1 parameters
-    .filter((p: any) => p.node.params.length === 1)
-    .forEach((p: any) => {
-      const reference = getReference(p);
-      if (reference) {
-        messages.push({
-          reference,
-          name: p.node.id.name,
-          scope: jscodeshift(p.parent).closestScope()
-        });
-      }
-    });
-  return messages;
-}
-
 function getReference(commentedNodePath: any): string | undefined {
   return (commentedNodePath.node.comments as any[])
-    .map(comment => /@exports\s+([^\s]+)/.exec(comment.value))
+    .map(comment => /@memberof\s+([^\s]+)/.exec(comment.value))
     .map(match => match ? match[1] : undefined)
     .filter(match => match)
     [0];
@@ -256,26 +192,23 @@ function constructorsToInterfaces(ast: any) {
   ast
     .find(jscodeshift.FunctionDeclaration)
     .forEach((path: any) => {
-      path.node.comments.forEach((comment: any) => {
-        comment.value = comment.value.replace(/@constructor/g, '@interface');
-        comment.value = comment.value.replace(/^[\s\*]+@extends.*$/gm, '');
-        comment.value = comment.value.replace(/^[\s\*]+@param.*$/gm, '');
-        comment.value = comment.value.replace(/^[\s\*]+@returns.*$/gm, '');
-      });
-      jscodeshift(path).replaceWith(path.node);
-    });
-}
-
-function removePropertiesType(ast: any) {
-  ast
-    .find(jscodeshift.FunctionDeclaration)
-    .forEach((path: any) => {
-      path.node.comments.forEach((comment: any) => {
-        // Remove $Properties typedefs, as we use the original type name
-        if (/@typedef\s+\S+\$Properties/.test(comment.value)) {
-          comment.value = '';
-        }
-      });
+      const interfaceComments = path.node.comments.filter((comment: any) => /@interface/.test(comment.value));
+      if (interfaceComments.length) {
+        // Message type has an @interface declaration
+        path.node.comments = interfaceComments;
+        path.node.comments.forEach((comment: any) => {
+          comment.value = comment.value.replace(/^([\s\*]+@interface\s+)I/gm, '$1');
+          comment.value = comment.value.replace(/^([\s\*]+@property\s+\{.*?\.)I([^.]+\})/gm, '$1$2');
+        });
+      } else {
+        // Otherwise this is a service
+        path.node.comments.forEach((comment: any) => {
+          comment.value = comment.value.replace(/@constructor/g, '@interface');
+          comment.value = comment.value.replace(/^[\s\*]+@extends.*$/gm, '');
+          comment.value = comment.value.replace(/^[\s\*]+@param.*$/gm, '');
+          comment.value = comment.value.replace(/^[\s\*]+@returns.*$/gm, '');
+        });
+      }
       jscodeshift(path).replaceWith(path.node);
     });
 }
@@ -296,21 +229,72 @@ function cleanMethodSignatures(ast: any) {
           path.node.comments = [];
         }
       }
-      let returnType: string;
       path.node.comments.forEach((comment: any) => {
         // Remove callback typedefs, as we use Observable instead of callbacks
-        if (/@typedef\s+\w+_Callback/.test(comment.value)) {
-          comment.value.replace(/@param\s+\{([^\}]+)\}[^\n]*response/g, (_: string, type: string) => {
-            returnType = type;
-          });
+        if (/@typedef\s+\w+Callback/.test(comment.value)) {
           comment.value = '';
         }
-        // Change signature of service methods
-        if (/@param\s+[^\n]*_Callback/.test(comment.value)) {
-          comment.value = comment.value.replace(/^[\s\*]+@param\s+[^\n]*_Callback.*$\n?/gm, '');
-          comment.value = comment.value.replace(/(@param\s*\{.*?)\|Object(\.<.*?>)?(\})/g, '$1$3');
-          if (returnType) {
-            comment.value = comment.value.replace(/@returns.*$/gm, `@returns {Observable<${returnType}>}`);
+
+        if (/@param\s+\{.*?Callback\}\s+callback/.test(comment.value)) {
+          comment.value = '';
+        }
+      });
+      // Remove empty comments
+      path.node.comments = path.node.comments.filter((x: any) => x.value);
+      jscodeshift(path).replaceWith(path.node);
+    });
+
+  // The promise variant of service methods are after the method declerations,
+  // so the last method will have its comment followed by a return statement.
+  ast
+    .find(jscodeshift.ExpressionStatement)
+    .filter((path: any) => path.node.comments)
+    .forEach(fixReturnType);
+  ast
+    .find(jscodeshift.ReturnStatement)
+    .filter((path: any) => path.node.comments)
+    .forEach(fixReturnType);
+
+  function fixReturnType(path: any) {
+    let changed = false;
+    path.node.comments.forEach((comment: any) => {
+      const returnsPromiseRe = /(@returns\s+\{)Promise(<)/g;
+      if (returnsPromiseRe.test(comment.value)) {
+        changed = true;
+        comment.value = comment.value.replace(returnsPromiseRe, '$1Observable$2');
+        comment.value = comment.value.replace(/(@param\s+\{.*?\.)I([^.]+\})/g, '$1$2');
+      }
+    });
+    if (changed) {
+      path.node.comments = path.node.comments.filter((x: any) => x.value);
+      jscodeshift(path).replaceWith(path.node);
+    }
+  }
+}
+
+function removeMembers(ast: any, root: protobuf.Root) {
+  ast
+    .find(jscodeshift.ExpressionStatement)
+    .filter((path: any) => path.node.comments)
+    .forEach((path: any) => {
+      path.node.comments.forEach((comment: any) => {
+        // Remove members of classes, as we use interfaces. But keep the oneofs,
+        // as they are not part of the interfaces.
+        if (/@member /.test(comment.value)) {
+          let member;
+          comment.value.replace(/@member\s+\{.*?\}\s+([^\s]+)/g, (match: string, _member_: string) => {
+            member = _member_;
+            return match;
+          });
+
+          let oneofNames: string[] = [];
+          comment.value.replace(/@memberof\s+([^\s]+)/g, (match: string, memberOf: string) => {
+            oneofNames = root.lookupType(memberOf).oneofsArray.map(oneof => oneof.name);
+            return match;
+          });
+
+          if (!member || oneofNames.indexOf(member) === -1) {
+            comment.value = '';
           }
         }
       });
@@ -345,10 +329,17 @@ function buildClientFactorySource(namespace: string, services: Services) {
 
 function getNamepaceName(declarations: any) {
   let namespaceName = '';
-  declarations.paths()[0].node.comments.forEach((comment: any) => {
+  const node = declarations.paths()[0].node;
+  node.comments.forEach((comment: any) => {
     comment.value.replace(/@exports\s+([^\s]+)/g, (_: string, reference: string) => {
       namespaceName = reference;
     });
+    if (!namespaceName) {
+      comment.value.replace(/@memberof\s+([^\s]+)/g, (_: string, memberOf: string) => {
+        const name = node.declarations[0].id.name;
+        namespaceName = memberOf + '.' + name;
+      });
+    }
   });
   return namespaceName;
 }
@@ -382,10 +373,10 @@ function getNamepaceDeclarations(ast: any): any {
     }));
 }
 
-type Callable = (args: string[]) => Promise<any>;
+type PbMain = typeof pbjsMain | typeof pbtsMain;
 type Options = { [name: string]: string };
 
-async function call(tempDir: string, func: Callable, files: string[], ext = 'js', flags: string[] = [], opts: Options = {}) {
+async function call(tempDir: string, func: PbMain, files: string[], ext = 'js', flags: string[] = [], opts: Options = {}) {
   const out = `${tempDir}/${Math.random()}.${ext}`;
   const all = { ...opts, out } as typeof opts;
   const args = Object.keys(all).map(name => [`--${name}`, all[name]]);
