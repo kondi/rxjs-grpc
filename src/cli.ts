@@ -123,6 +123,7 @@ function transformTypeScriptSource(source: string) {
   source = source.replace(/^import.*?$\n?/gm, '');
   // Add our imports
   source = `import { Observable } from 'rxjs';\n${source}`;
+  source = `import * as grpc from 'grpc';\n${source}`;
 
   if (source.includes('$protobuf')) {
     source = `import * as $protobuf from 'protobufjs';\n${source}`;
@@ -242,10 +243,10 @@ function cleanMethodSignatures(ast: Collection<ASTNode>) {
 
   // The promise variant of service methods are after the method declerations,
   // so the last method will have its comment followed by a return statement.
-  ast.find(jscodeshift.ExpressionStatement).forEach(fixReturnType);
-  ast.find(jscodeshift.ReturnStatement).forEach(fixReturnType);
+  ast.find(jscodeshift.ExpressionStatement).forEach(fixPromiseMethodSignature);
+  ast.find(jscodeshift.ReturnStatement).forEach(fixPromiseMethodSignature);
 
-  function fixReturnType(
+  function fixPromiseMethodSignature(
     path: ASTPath<jscodeshift.ExpressionStatement | jscodeshift.ReturnStatement>,
   ) {
     if (!path.node.comments) {
@@ -258,6 +259,11 @@ function cleanMethodSignatures(ast: Collection<ASTNode>) {
         changed = true;
         comment.value = comment.value.replace(returnsPromiseRe, '$1Observable$2');
         comment.value = comment.value.replace(/(@param\s+\{.*?\.)I([^.]+\})/g, '$1$2');
+        // Add optional metadata parameter
+        comment.value = comment.value.replace(
+          /^([\s\*]+@param\s+)(\{.*)$/gm,
+          '$1$2\n$1{grpc.Metadata=} metadata Optional metadata',
+        );
       }
     });
     if (changed) {
