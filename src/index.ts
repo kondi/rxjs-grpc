@@ -1,3 +1,4 @@
+import * as protoLoader from '@grpc/proto-loader';
 import * as grpc from 'grpc';
 import { Observable } from 'rxjs';
 
@@ -23,7 +24,7 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
     }
   };
 
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  const pkg = lookupPackage(grpcLoad(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
     builder[`add${name}`] = function(rxImpl: DynamicMethods) {
       server.addService(pkg[name].service, createService(pkg[name], rxImpl));
@@ -32,6 +33,15 @@ export function serverBuilder<T>(protoPath: string, packageName: string): T & Ge
   }
 
   return builder as any;
+}
+
+function grpcLoad(protoPath: string) {
+  const packageDefinition = protoLoader.loadSync(protoPath, {
+    keepCase: true,
+    defaults: true,
+    oneofs: true,
+  });
+  return grpc.loadPackageDefinition(packageDefinition);
 }
 
 function createService(Service: any, rxImpl: DynamicMethods) {
@@ -93,7 +103,7 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
   }
 
   const prototype: DynamicMethods = Constructor.prototype;
-  const pkg = lookupPackage(grpc.load(protoPath), packageName)
+  const pkg = lookupPackage(grpcLoad(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
     prototype[`get${name}`] = function(this: Constructor) {
       return createServiceClient(pkg[name], this.__args);
