@@ -1,93 +1,58 @@
 {
   "rulesDirectory": [
-    "node_modules/tslint-config-prettier"
+    "tslint-microsoft-contrib",
+    "tslint-misc-rules",
+    "tslint-consistent-codestyle",
+    "tslint-config-prettier"
   ],
   "rules": {
+    "ban-comma-operator": true,
     "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
+    "class-method-newlines": true,
+    "comment-format": [true, "check-space"],
     "curly": true,
-    "eofline": true,
     "forin": true,
-    "indent": [
-      true,
-      "spaces"
-    ],
     "label-position": true,
-    "max-line-length": [
-      true,
-      140
-    ],
     "member-access": false,
     "member-ordering": [
       true,
-      "static-before-instance",
-      "variables-before-functions"
+      {
+        "order": ["static-field", "instance-field", "static-method", "instance-method"]
+      }
     ],
+    "no-accessor-recursion": true,
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
     "no-construct": true,
     "no-debugger": true,
+    "no-duplicate-switch-case": true,
     "no-duplicate-variable": true,
     "no-empty": false,
     "no-eval": true,
-    "no-inferrable-types": true,
+    "no-inferrable-types": [true],
+    "no-return-await": true,
     "no-shadowed-variable": true,
+    "no-static-this": true,
     "no-string-literal": false,
+    "no-suspicious-comment": true,
     "no-switch-case-fall-through": true,
-    "no-trailing-whitespace": true,
     "no-unused-expression": true,
-    "no-unused-variable": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "object-literal-sort-keys": false,
-    "one-line": [
-      true,
-      "check-open-brace",
-      "check-catch",
-      "check-else",
-      "check-whitespace"
-    ],
-    "quotemark": [
-      true,
-      "single"
-    ],
-    "radix": true,
-    "semicolon": [
-      "always"
-    ],
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
-    "typedef-whitespace": [
+    "ordered-imports": [
       true,
       {
-        "call-signature": "nospace",
-        "index-signature": "nospace",
-        "parameter": "nospace",
-        "property-declaration": "nospace",
-        "variable-declaration": "nospace"
+        "grouped-imports": true
       }
     ],
-    "variable-name": false,
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-separator",
-      "check-type"
-    ]
+    "prefer-const": true,
+    "prefer-readonly": true,
+    "prefer-while": true,
+    "radix": true,
+    "semicolon": [true, "always"],
+    "triple-equals": [true, "allow-null-check"],
+    "variable-name": false
   }
 }

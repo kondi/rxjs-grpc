@@ -1,8 +1,9 @@
-import * as path from 'path';
 import * as glob from 'glob';
 import { fs } from 'mz';
+import * as path from 'path';
 
 import * as cli from '../cli';
+
 import { compileInMemory, Sources } from './utils';
 
 describe('compile/examples', () => {

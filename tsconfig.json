@@ -11,6 +11,12 @@
     "preserveConstEnums": true,
     "sourceMap": true,
     "target": "es5",
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin",
+        "ignoreDefinitionFiles": true
+      }
+    ],
     "typeRoots": [
       "./node_modules/@types"
     ]

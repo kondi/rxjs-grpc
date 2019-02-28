@@ -1,4 +1,5 @@
 import * as cli from '../cli';
+
 import { compileInMemory } from './utils';
 
 describe('multiple services test', () => {

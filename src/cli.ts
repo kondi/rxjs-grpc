@@ -1,12 +1,12 @@
+import { promisify } from 'bluebird';
 import * as jscodeshift from 'jscodeshift';
 import { ASTNode, ASTPath } from 'jscodeshift';
 import { Collection } from 'jscodeshift/src/Collection';
 import * as minimist from 'minimist';
+import { fs } from 'mz';
 import * as protobuf from 'protobufjs';
 import { pbjs, pbts } from 'protobufjs/cli';
 import * as tmp from 'tmp';
-import { fs } from 'mz';
-import { promisify } from 'bluebird';
 
 const pbjsMain = promisify(pbjs.main);
 const pbtsMain = promisify(pbts.main);
@@ -45,7 +45,7 @@ export async function main(args: string[]) {
     return 1;
   }
 
-  let ts = await buildTypeScript(protoFiles);
+  const ts = await buildTypeScript(protoFiles);
   if (out) {
     await fs.writeFile(out, ts);
   } else {

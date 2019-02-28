@@ -57,9 +57,12 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^1.16.4",
     "rxjs": "^6.0.0",
-    "tslint": "^4.5.1",
+    "tslint": "^5.13.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "~2.9.0"
+    "tslint-consistent-codestyle": "^1.15.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "tslint-misc-rules": "^3.5.1",
+    "typescript": "~3.0.0"
   },
   "peerDependencies": {
     "rxjs": "^6.0.0"
