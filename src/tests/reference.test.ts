@@ -2,7 +2,6 @@ import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
 describe('reference test', () => {
-
   let namespaces: string;
 
   beforeAll(async () => {
@@ -18,7 +17,7 @@ describe('reference test', () => {
         message SubMessage {
           string subName = 1;
         }
-      `
+      `,
     ]);
   });
 
@@ -33,7 +32,7 @@ describe('reference test', () => {
         };
 
         console.log(message.sub);
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -52,10 +51,9 @@ describe('reference test', () => {
         };
 
         console.log(message.sub, message.sub.subName);
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
   });
-
 });

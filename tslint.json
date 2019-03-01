@@ -1,4 +1,7 @@
 {
+  "rulesDirectory": [
+    "node_modules/tslint-config-prettier"
+  ],
   "rules": {
     "class-name": true,
     "comment-format": [

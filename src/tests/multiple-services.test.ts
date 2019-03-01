@@ -2,7 +2,6 @@ import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
 describe('multiple services test', () => {
-
   let namespaces: string;
 
   beforeAll(async () => {
@@ -34,7 +33,7 @@ describe('multiple services test', () => {
         message ReplyB {
           string reply_field = 1;
         }
-      `
+      `,
     ]);
   });
 
@@ -51,7 +50,7 @@ describe('multiple services test', () => {
         builder.addServiceB({
           methodB: {} as any
         });
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -66,10 +65,9 @@ describe('multiple services test', () => {
         const factory: test.ClientFactory = {} as any;
         factory.getServiceA().methodA({} as test.RequestA);
         factory.getServiceB().methodB({} as test.RequestB);
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
   });
-
 });

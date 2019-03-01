@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 export type Sources = {
-  [name: string]: string
+  [name: string]: string;
 };
 
 export type CompileResult = {
@@ -17,7 +17,7 @@ export function compileInMemory(sources: Sources) {
     target: ts.ScriptTarget.ES5,
     module: ts.ModuleKind.CommonJS,
     noLib: false,
-    lib: ['lib.es6.d.ts']
+    lib: ['lib.es6.d.ts'],
   };
 
   const compilerHost = createCompilerHost(sources, options);
@@ -26,7 +26,7 @@ export function compileInMemory(sources: Sources) {
 
   return {
     ok: !emitResult.emitSkipped,
-    errors: extractErrors(emitResult, program)
+    errors: extractErrors(emitResult, program),
   };
 }
 
@@ -45,15 +45,15 @@ function createCompilerHost(sources: Sources, options: ts.CompilerOptions): ts.C
     return moduleNames.map(moduleName => {
       if (moduleName === 'rxjs-grpc') {
         return {
-          resolvedFileName: path.join(__dirname, '..', 'index.d.ts')
+          resolvedFileName: path.join(__dirname, '..', 'index.d.ts'),
         };
       } else if (moduleName === './grpc-namespaces') {
         return {
-          resolvedFileName: 'grpc-namespaces.ts'
+          resolvedFileName: 'grpc-namespaces.ts',
         };
       } else {
         const result = ts.resolveModuleName(moduleName, containingFile, options, this);
-        return <ts.ResolvedModule> result.resolvedModule;
+        return <ts.ResolvedModule>result.resolvedModule;
       }
     });
   };

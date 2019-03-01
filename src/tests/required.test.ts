@@ -2,7 +2,6 @@ import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
 describe('required test', () => {
-
   let namespaces: string;
 
   beforeAll(async () => {
@@ -15,7 +14,7 @@ describe('required test', () => {
           required string name = 1;
           uint32 number = 2;
         }
-      `
+      `,
     ]);
   });
 
@@ -30,7 +29,7 @@ describe('required test', () => {
         };
 
         console.log(message.name);
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -45,10 +44,9 @@ describe('required test', () => {
         const message: test.Message = {
           number: 42
         };
-      `
+      `,
     });
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.ok).toBe(false);
   });
-
 });

@@ -18,11 +18,16 @@
     "build": "tsc",
     "lint": "tslint --project .",
     "prepublishOnly": "npm run build",
-    "pretest": "npm run build",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "npm-run-all --parallel test:*",
+    "test:lint": "npm run lint",
+    "test:format": "npm run format:check",
+    "pretest:unit": "npm run build",
+    "test:unit": "jest",
+    "watch:test": "jest --watch",
     "coverage": "jest --coverage",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "format:check": "prettier --list-different \"{src,examples}/**/*.ts\"",
+    "format:apply": "prettier --write \"{src,examples}/**/*.ts\""
   },
   "jest": {
     "setupTestFrameworkScriptFile": "./setup-jest"
@@ -49,8 +54,11 @@
     "glob": "^7.1.1",
     "jasmine": "^2.5.3",
     "jest": "^21.2.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.16.4",
     "rxjs": "^6.0.0",
     "tslint": "^4.5.1",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "~2.9.0"
   },
   "peerDependencies": {

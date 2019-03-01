@@ -1,3 +1,15 @@
 {
-    "typescript.tsdk": "./node_modules/typescript/lib"
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "files.exclude": {
+    "js": true
+  },
+  "search.exclude": {
+    "js": true,
+    "node_modules": true
+  },
 }

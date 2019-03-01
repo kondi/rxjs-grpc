@@ -2,7 +2,6 @@ import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
 describe('multiple namespaces test', () => {
-
   let namespaces: string;
 
   beforeAll(async () => {
@@ -31,7 +30,7 @@ describe('multiple namespaces test', () => {
         message Message {
           required string second_name = 1;
         }
-      `
+      `,
     ]);
   });
 
@@ -43,7 +42,7 @@ describe('multiple namespaces test', () => {
 
         let firstMessage: first.Message;
         let secondMessage: second.Message;
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -62,7 +61,7 @@ describe('multiple namespaces test', () => {
         const secondMessage: second.Message = {
           second_name: 'string'
         };
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -78,7 +77,7 @@ describe('multiple namespaces test', () => {
           first_name: 'string',
           second_name: 'should be an error'
         };
-      `
+      `,
     });
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.ok).toBe(false);
@@ -94,7 +93,7 @@ describe('multiple namespaces test', () => {
           first_name: 'string'
         };
         const secondMessage: second.Message = firstMessage;
-      `
+      `,
     });
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.ok).toBe(false);
@@ -114,7 +113,7 @@ describe('multiple namespaces test', () => {
         const secondService: second.Service = secondFactory.getService();
         secondService.method({ second_name: 'string' });
         secondService.methodOnlyInSecond({ second_name: 'string' });
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -130,10 +129,9 @@ describe('multiple namespaces test', () => {
         const firstService: first.Service = firstFactory.getService();
         firstService.method({ first_name: 'string' });
         firstService.methodOnlyInSecond({} as any);
-      `
+      `,
     });
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.ok).toBe(false);
   });
-
 });

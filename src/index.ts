@@ -4,24 +4,27 @@ import { Observable } from 'rxjs';
 
 import { lookupPackage } from './utils';
 
-type DynamicMethods = { [name: string]: any; };
+type DynamicMethods = { [name: string]: any };
 
 export interface GenericServerBuilder<T> {
   start(address: string, credentials?: any): void;
   forceShutdown(): void;
 }
 
-export function serverBuilder<T>(protoPath: string, packageName: string): T & GenericServerBuilder<T> {
+export function serverBuilder<T>(
+  protoPath: string,
+  packageName: string,
+): T & GenericServerBuilder<T> {
   const server = new grpc.Server();
 
-  const builder: DynamicMethods = <GenericServerBuilder<T>> {
+  const builder: DynamicMethods = <GenericServerBuilder<T>>{
     start(address: string, credentials?: any) {
       server.bind(address, credentials || grpc.ServerCredentials.createInsecure());
       server.start();
     },
     forceShutdown() {
       server.forceShutdown();
-    }
+    },
   };
 
   const pkg = lookupPackage(grpcLoad(protoPath), packageName);
@@ -64,10 +67,7 @@ function createUnaryMethod(rxImpl: DynamicMethods, name: string) {
   return function(call: any, callback: any) {
     try {
       const response: Observable<any> = rxImpl[name](call.request, call.metadata);
-      response.subscribe(
-        data => callback(null, data),
-        error => callback(error)
-      );
+      response.subscribe(data => callback(null, data), error => callback(error));
     } catch (error) {
       callback(error);
     }
@@ -86,20 +86,18 @@ function createStreamingMethod(rxImpl: DynamicMethods, name: string) {
   };
 }
 
-export type ClientFactoryConstructor<T> = new(address: string, credentials?: any, options?: any) => T;
+export type ClientFactoryConstructor<T> = new (
+  address: string,
+  credentials?: any,
+  options?: any,
+) => T;
 
 export function clientFactory<T>(protoPath: string, packageName: string) {
   class Constructor {
-
     readonly __args: any[];
     constructor(address: string, credentials?: any, options: any = undefined) {
-      this.__args = [
-        address,
-        credentials || grpc.credentials.createInsecure(),
-        options
-      ];
+      this.__args = [address, credentials || grpc.credentials.createInsecure(), options];
     }
-
   }
 
   const prototype: DynamicMethods = Constructor.prototype;
@@ -110,7 +108,7 @@ export function clientFactory<T>(protoPath: string, packageName: string) {
     };
   }
 
-  return <any> Constructor as ClientFactoryConstructor<T>;
+  return (Constructor as any) as ClientFactoryConstructor<T>;
 }
 
 function getServiceNames(pkg: any) {

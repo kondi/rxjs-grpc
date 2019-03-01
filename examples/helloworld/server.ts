@@ -9,10 +9,9 @@ async function main() {
   const server = serverBuilder<ServerBuilder>('helloworld.proto', 'helloworld');
 
   server.addGreeter({
-
     sayHello(request) {
       return of({
-        message: 'Hello ' + request.name
+        message: 'Hello ' + request.name,
       });
     },
 
@@ -21,8 +20,7 @@ async function main() {
         mapTo({ message: `Hello ${request.name}` }),
         take(request.num_greetings),
       );
-    }
-
+    },
   });
 
   server.start('0.0.0.0:50051');

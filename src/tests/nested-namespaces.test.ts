@@ -2,7 +2,6 @@ import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
 describe('nested namespaces test', () => {
-
   let namespaces: string;
 
   beforeAll(async () => {
@@ -42,7 +41,7 @@ describe('nested namespaces test', () => {
         message Message {
           required string name = 1;
         }
-      `
+      `,
     ]);
   });
 
@@ -55,7 +54,7 @@ describe('nested namespaces test', () => {
         let msgA: a.Message;
         let msgB: a.b.Message;
         let msgC: a.b.c.Message;
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -70,7 +69,7 @@ describe('nested namespaces test', () => {
         ({} as any as a.ClientFactory).getAService();
         ({} as any as a.b.ClientFactory).getABService();
         ({} as any as a.b.c.ClientFactory).getABCService();
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -83,10 +82,9 @@ describe('nested namespaces test', () => {
         import { a } from './grpc-namespaces';
 
         ({} as any as a.ClientFactory).getABService();
-      `
+      `,
     });
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.ok).toBe(false);
   });
-
 });

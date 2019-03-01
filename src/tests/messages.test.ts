@@ -2,7 +2,6 @@ import * as cli from '../cli';
 import { compileInMemory } from './utils';
 
 describe('messages test', () => {
-
   let namespaces: string;
 
   beforeAll(async () => {
@@ -16,7 +15,7 @@ describe('messages test', () => {
           uint32 number = 2;
           int64 number2 = 3;
         }
-      `
+      `,
     ]);
   });
 
@@ -32,7 +31,7 @@ describe('messages test', () => {
         };
 
         console.log(message.name, message.number);
-      `
+      `,
     });
     expect(result.errors).toEqual([]);
     expect(result.ok).toBe(true);
@@ -47,7 +46,7 @@ describe('messages test', () => {
         const message: test.Message = {
           missing: 1234
         };
-      `
+      `,
     });
     expect(result.ok).toBe(false);
   });
@@ -60,7 +59,7 @@ describe('messages test', () => {
 
         const message: test.Message = {};
         console.log(message.missing);
-      `
+      `,
     });
     expect(result.ok).toBe(false);
   });
@@ -74,7 +73,7 @@ describe('messages test', () => {
         const message: test.Message = {
           number: 'string'
         };
-      `
+      `,
     });
     expect(result.ok).toBe(false);
   });
@@ -87,9 +86,8 @@ describe('messages test', () => {
 
         const message: test.Message = {};
         const s: string = message.number;
-      `
+      `,
     });
     expect(result.ok).toBe(false);
   });
-
 });
