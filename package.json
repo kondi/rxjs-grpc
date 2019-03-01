@@ -41,6 +41,7 @@
     "@types/bluebird": "^3.0.37",
     "@types/glob": "^5.0.30",
     "@types/jasmine": "^2.5.43",
+    "@types/jscodeshift": "^0.6.0",
     "@types/minimist": "^1.2.0",
     "@types/mz": "^0.0.30",
     "@types/node": "^7.0.5",
@@ -50,7 +51,7 @@
     "jest": "^21.2.1",
     "rxjs": "^6.0.0",
     "tslint": "^4.5.1",
-    "typescript": "~2.8.4"
+    "typescript": "~2.9.0"
   },
   "peerDependencies": {
     "rxjs": "^6.0.0"
