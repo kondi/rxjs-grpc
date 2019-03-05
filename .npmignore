@@ -25,3 +25,11 @@ yarn-error.log*
 # System Files
 .DS_Store
 Thumbs.db
+
+# Not needed for release
+/examples
+/js/tests
+/src/tests
+/.editorconfig
+/.prettierrc.json
+/*.js
