@@ -1,6 +1,6 @@
 import * as grpc from 'grpc';
 import { Observable } from 'rxjs/Observable';
-
+import 'rxjs/add/operator/publishReplay';
 import { lookupPackage } from './utils';
 
 type DynamicMethods = { [name: string]: any; };
@@ -139,11 +139,16 @@ function createUnaryClientMethod(grpcClient: DynamicMethods, name: string) {
 
 function createStreamingClientMethod(grpcClient: DynamicMethods, name: string) {
   return function(...args: any[]) {
-    return new Observable(observer => {
-      const call = grpcClient[name](...args);
+    const call = grpcClient[name](...args);
+    // Internal observable is closed when shared observable reference count drops to zero
+    const obs = new Observable(observer => {
       call.on('data', (data: any) => observer.next(data));
+      call.on('close', () => observer.complete());
       call.on('error', (error: any) => observer.error(error));
-      call.on('end', () => observer.complete());
+      call.on('end', () => call.destroy());
+      return () => call.cancel();
     });
+    return obs.publishReplay()// replay the whole stream on new subscriber
+    .refCount();
   };
 }
