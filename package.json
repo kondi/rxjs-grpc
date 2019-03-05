@@ -2,7 +2,7 @@
   "main": "js/index",
   "typings": "js/index",
   "name": "rxjs-grpc",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "Typesafe gRPC with RxJS in TypeScript",
   "license": "MIT",
   "keywords": [],
