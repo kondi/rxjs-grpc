@@ -30,13 +30,16 @@ export function lookupPackage(root: GrpcObject, packageName: string) {
   return pkg;
 }
 
-export function grpcLoad(protoPath: string) {
-  const packageDefinition = protoLoader.loadSync(protoPath, {
+export function protoLoad(protoPath: string) {
+  return protoLoader.loadSync(protoPath, {
     keepCase: true,
     defaults: true,
     oneofs: true,
   });
-  return loadPackageDefinition(packageDefinition);
+}
+
+export function grpcLoad(protoPath: string) {
+  return loadPackageDefinition(protoLoad(protoPath));
 }
 
 export function createService(Service: GrpcService<any>, rxImpl: DynamicMethods) {
