@@ -1,3 +1,12 @@
+<a name="0.2.1"></a>
+
+# [0.2.1](https://github.com/kondi/rxjs-grpc/compare/v0.2.0...v0.2.1) (2019-03-13)
+
+### Features
+
+- Add optional server instance parameter to serverBuilder (closes [#20](https://github.com/kondi/rxjs-grpc/issues/20)) ([2c1841a](https://github.com/kondi/rxjs-grpc/commit/2c1841a))
+- Fix all current dependency audit alerts ([9347d54](https://github.com/kondi/rxjs-grpc/commit/9347d54))
+
 <a name="0.2.0"></a>
 
 # [0.2.0](https://github.com/kondi/rxjs-grpc/compare/v0.1.7...v0.2.0) (2019-03-05)
@@ -10,8 +19,7 @@
 
 ### Code Refactoring
 
-- Change build from prepublish to prepublishOnly script
-([dca14bd](https://github.com/kondi/rxjs-grpc/commit/dca14bd))
+- Change build from prepublish to prepublishOnly script ([dca14bd](https://github.com/kondi/rxjs-grpc/commit/dca14bd))
 - Use @types/jscodeshift and make cli code typesafe ([24aed05](https://github.com/kondi/rxjs-grpc/commit/24aed05))
 - Install and configure prettier ([82725e8](https://github.com/kondi/rxjs-grpc/commit/82725e8))
 - Upgrade tslint and update lint rules ([1e9d4dd](https://github.com/kondi/rxjs-grpc/commit/1e9d4dd))
