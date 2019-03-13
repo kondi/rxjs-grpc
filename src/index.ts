@@ -17,9 +17,8 @@ export interface GenericServerBuilder<T> {
 export function serverBuilder<T>(
   protoPath: string,
   packageName: string,
+  server = new grpc.Server(),
 ): T & GenericServerBuilder<T> {
-  const server = new grpc.Server();
-
   const builder: DynamicMethods = <GenericServerBuilder<T>>{
     start(address, credentials) {
       server.bind(address, credentials || grpc.ServerCredentials.createInsecure());
