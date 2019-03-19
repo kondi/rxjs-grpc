@@ -1,3 +1,16 @@
+<a name="0.2.2"></a>
+
+# [0.2.2](https://github.com/kondi/rxjs-grpc/compare/v0.2.1...v0.2.2) (2019-03-19)
+
+### Code Refactoring
+
+- Extract generic functions from index.ts to utils.ts ([3c50d39](https://github.com/kondi/rxjs-grpc/commit/3c50d39))
+
+### Experimental
+
+- Add experimental rawClientFactory and service codecs ([495ebfc](https://github.com/kondi/rxjs-grpc/commit/495ebfc))
+- Add notes about the experimental API ([5b05e51](https://github.com/kondi/rxjs-grpc/commit/5b05e51))
+
 <a name="0.2.1"></a>
 
 # [0.2.1](https://github.com/kondi/rxjs-grpc/compare/v0.2.0...v0.2.1) (2019-03-13)
