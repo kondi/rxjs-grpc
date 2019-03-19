@@ -1,3 +1,11 @@
+<a name="0.2.3"></a>
+
+# [0.2.3](https://github.com/kondi/rxjs-grpc/compare/v0.2.2...v0.2.3) (2019-03-19)
+
+### Bug Fixes
+
+- Export mistakenly removed ClientFactoryConstructor in [3c50d39](https://github.com/kondi/rxjs-grpc/commit/3c50d39) ([23ba757](https://github.com/kondi/rxjs-grpc/commit/23ba757))
+
 <a name="0.2.2"></a>
 
 # [0.2.2](https://github.com/kondi/rxjs-grpc/compare/v0.2.1...v0.2.2) (2019-03-19)
