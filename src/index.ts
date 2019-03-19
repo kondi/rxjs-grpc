@@ -11,6 +11,8 @@ import {
   lookupPackage,
 } from './utils';
 
+export { ClientFactoryConstructor } from './utils';
+
 export interface GenericServerBuilder<T> {
   start(address: string, credentials?: grpc.ServerCredentials): void;
   forceShutdown(): void;
