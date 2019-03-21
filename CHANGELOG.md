@@ -1,3 +1,11 @@
+<a name="0.2.4"></a>
+
+# [0.2.4](https://github.com/kondi/rxjs-grpc/compare/v0.2.3...v0.2.4) (2019-03-21)
+
+### Experimental
+
+- Export experimental types (CodecsFactory, RawClientFactory, RawService) ([f536f49](https://github.com/kondi/rxjs-grpc/commit/f536f49))
+
 <a name="0.2.3"></a>
 
 # [0.2.3](https://github.com/kondi/rxjs-grpc/compare/v0.2.2...v0.2.3) (2019-03-19)
