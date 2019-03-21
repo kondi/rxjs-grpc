@@ -35,7 +35,7 @@ type MethodCodecs<Method> = {
 
 type ServiceCodecs<Service> = { [MethodName in keyof Service]: MethodCodecs<Service[MethodName]> };
 
-type CodecsFactory<ClientFactory> = {
+export type CodecsFactory<ClientFactory> = {
   [GetterName in keyof ClientFactory]: () => ServiceCodecs<
     LooseReturnType<ClientFactory[GetterName]>
   >
@@ -46,9 +46,11 @@ type RawServiceMethod<Method> = (
   metadata?: grpc.Metadata,
 ) => Observable<SerializedMessage<ResponseType<Method>>>;
 
-type RawService<Service> = { [MethodName in keyof Service]: RawServiceMethod<Service[MethodName]> };
+export type RawService<Service> = {
+  [MethodName in keyof Service]: RawServiceMethod<Service[MethodName]>
+};
 
-type RawClientFactory<ClientFactory> = {
+export type RawClientFactory<ClientFactory> = {
   [GetterName in keyof ClientFactory]: () => RawService<LooseReturnType<ClientFactory[GetterName]>>
 };
 
