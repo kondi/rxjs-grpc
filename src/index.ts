@@ -1,48 +1,35 @@
 import * as grpc from 'grpc';
 
 import {
+  addServerBuildMethods,
   ClientFactoryConstructor,
   createService,
   createServiceClient,
   DynamicMethods,
+  GenericServerBuilder,
   getServiceNames,
   grpcLoad,
   GrpcService,
   lookupPackage,
 } from './utils';
 
-export { ClientFactoryConstructor } from './utils';
-
-export interface GenericServerBuilder<T> {
-  start(address: string, credentials?: grpc.ServerCredentials): void;
-  forceShutdown(): void;
-}
+export { ClientFactoryConstructor, GenericServerBuilder } from './utils';
 
 export function serverBuilder<T>(
   protoPath: string,
   packageName: string,
   server = new grpc.Server(),
 ): T & GenericServerBuilder<T> {
-  const builder: DynamicMethods = <GenericServerBuilder<T>>{
-    start(address, credentials) {
-      server.bind(address, credentials || grpc.ServerCredentials.createInsecure());
-      server.start();
-    },
-    forceShutdown() {
-      server.forceShutdown();
-    },
-  };
-
+  const adders: DynamicMethods = {};
   const pkg = lookupPackage(grpcLoad(protoPath), packageName);
   for (const name of getServiceNames(pkg)) {
-    builder[`add${name}`] = function(rxImpl: DynamicMethods) {
+    adders[`add${name}`] = function(rxImpl: DynamicMethods) {
       const serviceData = (pkg[name] as any) as GrpcService<any>;
       server.addService(serviceData.service, createService(serviceData, rxImpl));
       return this;
     };
   }
-
-  return builder as any;
+  return addServerBuildMethods(adders, server) as any;
 }
 
 export function clientFactory<T>(protoPath: string, packageName: string) {

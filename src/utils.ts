@@ -6,6 +6,8 @@ import {
   handleServerStreamingCall,
   handleUnaryCall,
   loadPackageDefinition,
+  Server,
+  ServerCredentials,
   ServiceDefinition,
 } from 'grpc';
 import { Observable } from 'rxjs';
@@ -21,6 +23,27 @@ export type DynamicMethods = { [name: string]: any };
 export type GrpcService<T> = typeof Client & {
   service: ServiceDefinition<T>;
 };
+
+export interface GenericServerBuilder<T> {
+  start(address: string, credentials?: ServerCredentials): void;
+  forceShutdown(): void;
+}
+
+export function addServerBuildMethods<T>(
+  adders: T,
+  server = new Server(),
+): T & GenericServerBuilder<T> {
+  const builder: GenericServerBuilder<T> = {
+    start(address, credentials) {
+      server.bind(address, credentials || ServerCredentials.createInsecure());
+      server.start();
+    },
+    forceShutdown() {
+      server.forceShutdown();
+    },
+  };
+  return Object.assign(adders, builder);
+}
 
 export function lookupPackage(root: GrpcObject, packageName: string) {
   let pkg = root;
