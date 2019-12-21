@@ -1,3 +1,15 @@
+<a name="0.2.5"></a>
+
+# [0.2.5](https://github.com/kondi/rxjs-grpc/compare/v0.2.4...v0.2.5) (2019-12-21)
+
+### Code Refactoring
+
+- Extract addServerBuildMethods function to utils ([c5cfe9f](https://github.com/kondi/rxjs-grpc/commit/c5cfe9f))
+
+### Experimental
+
+- Add experimental rawServerBuilder ([61c57c9](https://github.com/kondi/rxjs-grpc/commit/61c57c9))
+
 <a name="0.2.4"></a>
 
 # [0.2.4](https://github.com/kondi/rxjs-grpc/compare/v0.2.3...v0.2.4) (2019-03-21)
