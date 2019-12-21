@@ -4,9 +4,12 @@ import { ServiceDefinition } from 'grpc';
 import { Observable, Subscribable } from 'rxjs';
 
 import {
+  addServerBuildMethods,
   ClientFactoryConstructor,
+  createService,
   createServiceClient,
   DynamicMethods,
+  GenericServerBuilder,
   getServiceNames,
   grpcLoad,
   GrpcService,
@@ -15,7 +18,8 @@ import {
 } from '../utils';
 
 type LooseReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-type RequestType<T> = T extends (arg: infer A, ...args: any[]) => any ? A : never;
+type FirstArgument<T> = T extends (arg: infer A, ...args: any[]) => any ? A : never;
+type RequestType<T> = FirstArgument<T>;
 type ResponseType<T> = LooseReturnType<T> extends Subscribable<infer A> ? A : never;
 
 export type SerializedMessage<T> = Buffer & {
@@ -54,6 +58,12 @@ export type RawClientFactory<ClientFactory> = {
   [GetterName in keyof ClientFactory]: () => RawService<LooseReturnType<ClientFactory[GetterName]>>
 };
 
+export type RawServerBuilder<ServerBuilder> = {
+  [AdderName in keyof ServerBuilder]: (
+    service: RawService<FirstArgument<ServerBuilder[AdderName]>>,
+  ) => RawServerBuilder<ServerBuilder>
+};
+
 export function rawClientFactory<ClientFactory>(protoPath: string, packageName: string) {
   class Constructor {
     readonly __args: [string, grpc.ChannelCredentials, any | undefined];
@@ -84,6 +94,33 @@ export function rawClientFactory<ClientFactory>(protoPath: string, packageName: 
   }
 
   return (Constructor as any) as ClientFactoryConstructor<RawClientFactory<ClientFactory>>;
+}
+
+export function rawServerBuilder<T>(
+  protoPath: string,
+  packageName: string,
+  server = new grpc.Server(),
+): RawServerBuilder<T> & GenericServerBuilder<RawServerBuilder<T>> {
+  const adders: DynamicMethods = {};
+  const pkg = lookupPackage(grpcLoad(protoPath), packageName);
+  for (const name of getServiceNames(pkg)) {
+    adders[`add${name}`] = function(rxImpl: DynamicMethods) {
+      const serviceData = (pkg[name] as any) as GrpcService<any>;
+      const definition = serviceData.service;
+      typedKeys(definition).forEach(methodKey => {
+        const methodDefinition = definition[methodKey];
+        methodDefinition.requestDeserialize = (serialized: SerializedMessage<any>) => {
+          return serialized;
+        };
+        methodDefinition.responseSerialize = (alreadySerialized: SerializedMessage<any>) => {
+          return alreadySerialized;
+        };
+      });
+      server.addService(serviceData.service, createService(serviceData, rxImpl));
+      return this;
+    };
+  }
+  return addServerBuildMethods(adders, server) as any;
 }
 
 export function buildCodecsFactory<ClientFactory>(
