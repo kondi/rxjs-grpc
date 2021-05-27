@@ -1,3 +1,11 @@
+<a name="0.2.6"></a>
+
+# [0.2.6](https://github.com/kondi/rxjs-grpc/compare/v0.2.5...v0.2.6) (2021-05-27)
+
+### Upgrade
+
+- Upgrade protobufjs to support newer grpc versions ([d375b71](https://github.com/kondi/rxjs-grpc/commit/d375b71))
+
 <a name="0.2.5"></a>
 
 # [0.2.5](https://github.com/kondi/rxjs-grpc/compare/v0.2.4...v0.2.5) (2019-12-21)
