@@ -133,8 +133,10 @@ function transformTypeScriptSource(source: string) {
   source = source.replace(/Observable\.</g, 'Observable<');
   // Remove public keyword from the field, because they are not allowed in interface
   source = source.replace(/^(\s+)public\s+/gm, '$1');
-  // Export interfaces, enums and namespaces
-  source = source.replace(/^(\s+)(interface|enum|namespace)(\s+)/gm, '$1export $2$3');
+  // Export interfaces and namespaces
+  source = source.replace(/^(\s+)(interface|namespace)(\s+)/gm, '$1export $2$3');
+  // Export enums as const enums (so that they are useable in the declaration file)
+  source = source.replace(/^(\s+)(enum)(\s+)/gm, '$1export const $2$3');
   return source;
 }
 
