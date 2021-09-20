@@ -123,7 +123,7 @@ function transformTypeScriptSource(source: string) {
   source = source.replace(/^import.*?$\n?/gm, '');
   // Add our imports
   source = `import { Observable } from 'rxjs';\n${source}`;
-  source = `import * as grpc from 'grpc';\n${source}`;
+  source = `import * as grpc from '@grpc/grpc-js';\n${source}`;
 
   if (source.includes('$protobuf')) {
     source = `import * as $protobuf from 'protobufjs';\n${source}`;

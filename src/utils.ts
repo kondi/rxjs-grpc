@@ -1,4 +1,3 @@
-import * as protoLoader from '@grpc/proto-loader';
 import {
   ChannelCredentials,
   Client,
@@ -9,7 +8,8 @@ import {
   Server,
   ServerCredentials,
   ServiceDefinition,
-} from 'grpc';
+} from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
 import { Observable } from 'rxjs';
 
 export type ClientFactoryConstructor<T> = new (

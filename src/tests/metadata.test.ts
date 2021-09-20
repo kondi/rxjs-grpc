@@ -26,7 +26,7 @@ describe('metadata test', () => {
     const result = compileInMemory({
       'grpc-namespaces.ts': namespaces,
       'test.ts': `
-        import { Metadata } from 'grpc';
+        import { Metadata } from '@grpc/grpc-js';
         import { clientFactory } from 'rxjs-grpc';
 
         import { test } from './grpc-namespaces';

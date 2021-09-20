@@ -1,6 +1,5 @@
+import * as grpc from '@grpc/grpc-js';
 import { AnyDefinition } from '@grpc/proto-loader';
-import * as grpc from 'grpc';
-import { ServiceDefinition } from 'grpc';
 import { Observable, Subscribable } from 'rxjs';
 
 import {
@@ -78,6 +77,7 @@ export function rawClientFactory<ClientFactory>(protoPath: string, packageName: 
     type GetterType = keyof ClientFactory;
     type ServiceType = LooseReturnType<ClientFactory[GetterType]>;
     prototype[`get${name}`] = function(this: Constructor) {
+      // @ts-ignore
       const grpcService = pkg[name] as GrpcService<ServiceType>;
       const definition = grpcService.service;
       typedKeys(definition).forEach(methodKey => {
@@ -140,7 +140,7 @@ export function buildCodecsFactory<ClientFactory>(
 }
 
 function buildServiceCodecs<Service>(
-  definition: ServiceDefinition<Service>,
+  definition: grpc.ServiceDefinition<Service>,
 ): ServiceCodecs<Service> {
   const codecs = {} as { [key in keyof Service]: MethodCodecs<Service[key]> };
   typedKeys(definition).forEach(methodKey => {
@@ -162,7 +162,7 @@ function buildServiceCodecs<Service>(
   return codecs;
 }
 
-function getMethodNames<T>(definition: ServiceDefinition<T>, key: keyof T) {
+function getMethodNames<T>(definition: grpc.ServiceDefinition<T>, key: keyof T) {
   const methodDefinition = definition[key];
   return [key, (methodDefinition as any).originalName as keyof T];
 }
@@ -170,7 +170,7 @@ function getMethodNames<T>(definition: ServiceDefinition<T>, key: keyof T) {
 function loadServices<ServiceType>(protoPath: string, packageName: string) {
   const packageDefinition = protoLoad(protoPath);
   const prefix = packageName + '.';
-  const pkg: Record<string, ServiceDefinition<ServiceType>> = {};
+  const pkg: Record<string, grpc.ServiceDefinition<ServiceType>> = {};
   Object.keys(packageDefinition)
     .filter(key => key.startsWith(prefix))
     .forEach(key => {
@@ -183,8 +183,8 @@ function loadServices<ServiceType>(protoPath: string, packageName: string) {
 }
 
 function isServiceDefinition<ServiceType>(
-  def: AnyDefinition | ServiceDefinition<any>,
-): def is ServiceDefinition<ServiceType> {
+  def: AnyDefinition | grpc.ServiceDefinition<any>,
+): def is grpc.ServiceDefinition<ServiceType> {
   return typeof def['format'] !== 'string';
 }
 

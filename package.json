@@ -20,30 +20,28 @@
     "prepublishOnly": "npm run build",
     "test": "npm-run-all --parallel test:*",
     "test:lint": "npm run lint",
-    "test:format": "npm run format:check",
     "pretest:unit": "npm run build",
     "test:unit": "jest",
     "watch:test": "jest --watch",
     "coverage": "jest --coverage",
     "watch": "tsc --watch",
-    "format:check": "prettier --list-different \"{src,examples}/**/*.ts\"",
     "format:apply": "prettier --write \"{src,examples}/**/*.ts\""
   },
   "jest": {
     "setupTestFrameworkScriptFile": "./setup-jest"
   },
   "dependencies": {
-    "@grpc/proto-loader": "^0.4.0",
-    "bluebird": "^3.4.7",
-    "grpc": "^1.18.0",
-    "jscodeshift": "^0.3.30",
+    "@grpc/grpc-js": "^1.3.7",
+    "@grpc/proto-loader": "^0.6.4",
+    "bluebird": "^3.5.36",
+    "jscodeshift": "^0.13.0",
     "minimist": "^1.2.0",
     "mz": "^2.6.0",
-    "protobufjs": "~6.10.0",
-    "tmp": "^0.0.31"
+    "protobufjs": "^6.11.2",
+    "tmp": "^0.2.1"
   },
   "devDependencies": {
-    "@types/bluebird": "^3.0.37",
+    "@types/bluebird": "^3.5.36",
     "@types/glob": "^5.0.30",
     "@types/jasmine": "^2.5.43",
     "@types/jscodeshift": "^0.6.0",
@@ -55,16 +53,19 @@
     "jasmine": "^2.5.3",
     "jest": "^21.2.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^1.16.4",
+    "prettier": "^2.4.1",
     "rxjs": "^6.0.0",
     "tslint": "^5.13.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-consistent-codestyle": "^1.15.0",
     "tslint-microsoft-contrib": "^6.0.0",
     "tslint-misc-rules": "^3.5.1",
-    "typescript": "~3.0.0"
+    "typescript": "^3.9.10"
   },
   "peerDependencies": {
     "rxjs": "^6.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

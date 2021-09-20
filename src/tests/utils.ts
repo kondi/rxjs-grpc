@@ -14,6 +14,7 @@ export function compileInMemory(sources: Sources) {
   const options: ts.CompilerOptions = {
     noEmitOnError: true,
     noImplicitAny: true,
+    skipLibCheck: true,
     target: ts.ScriptTarget.ES5,
     module: ts.ModuleKind.CommonJS,
     noLib: false,
