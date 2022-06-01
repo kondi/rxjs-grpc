@@ -1,3 +1,11 @@
+<a name="0.2.7"></a>
+
+# [0.2.7](https://github.com/kondi/rxjs-grpc/compare/v0.2.6...v0.2.7) (2022-06-02)
+
+### Upgrade
+
+- Allow rxjs 7 as peer dependency ([20d8359](https://github.com/kondi/rxjs-grpc/commit/20d8359))
+
 <a name="0.2.6"></a>
 
 # [0.2.6](https://github.com/kondi/rxjs-grpc/compare/v0.2.5...v0.2.6) (2021-05-27)
