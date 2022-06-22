@@ -183,6 +183,36 @@ function getReference(commentedNodePath: ASTPath<jscodeshift.FunctionDeclaration
 }
 
 function constructorsToInterfaces(ast: Collection<ASTNode>) {
+  const enums: String[] = [];
+  ast.find(jscodeshift.ExpressionStatement).forEach(path => {
+    if (!path.node.comments) {
+      return;
+    }
+    if (path.node.expression.type === 'AssignmentExpression') {
+      path.node.comments.forEach(comment => {
+        if (/@enum/.test(comment.value)) {
+          enums.push(comment.value);
+        }
+      });
+    }
+  });
+  const enumNames: RegExp[] = enums
+    .map(en => {
+      const temp = en.split('@name').pop();
+      if (!temp) {
+        return undefined;
+      }
+      const name = temp.split('\n').shift();
+      if (!name) {
+        return undefined;
+      }
+      return new RegExp(name.trim());
+    })
+    .filter(
+      (i): i is RegExp => {
+        return i instanceof RegExp;
+      },
+    );
   ast.find(jscodeshift.FunctionDeclaration).forEach(path => {
     if (!path.node.comments) {
       return;
@@ -195,7 +225,16 @@ function constructorsToInterfaces(ast: Collection<ASTNode>) {
       path.node.comments = interfaceComments;
       path.node.comments.forEach(comment => {
         comment.value = comment.value.replace(/^([\s\*]+@interface\s+)I/gm, '$1');
-        comment.value = comment.value.replace(/^([\s\*]+@property\s+\{.*?\.)I([^.]+\})/gm, '$1$2');
+        const commentValueLines = comment.value.split('\n');
+        commentValueLines.forEach((line, i) => {
+          if (!enumNames.some(name => name.test(line))) {
+            commentValueLines[i] = line.replace(
+              /^([\s\*]+@property\s+\{.*?\.)I([^.]+\})/gm,
+              '$1$2',
+            );
+          }
+        });
+        comment.value = commentValueLines.join('\n');
       });
     } else {
       // Otherwise this is a service
